@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -30,8 +29,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  List<String> countries = ['Vietnam', 'Cambodia','Thailand','Laos','Myanmar','Singapore','Brunei','Malaysia','Indonesia'];
-  String? selectedItem = 'Vietnam';
 
   bool _isObscure = true;
 
@@ -72,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Basic Form'),
+        title: Text('Note'),
       ),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -108,7 +105,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(height: 25,),
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  focusNode: myFocusNode,
                   onSaved: (v){
                     username = v ?? '';
                   },
@@ -124,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: "Username",
                     hintText: "Your username",
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.person_4),
                   ),
                 ),
                 SizedBox(height: 25,),
