@@ -50,9 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
       {
         _key.currentState?.save();
         print(fullname);
+        print(username);
         print(email);
-        print(age);
-        print(country);
         print(password);
         _key.currentState?.reset();
         myFocusNode.requestFocus();
@@ -64,9 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String fullname = '';
+  String username = '';
   String email = '';
-  int age = 18;
-  String country = '';
   String password = '';
 
 
@@ -80,7 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: EdgeInsets.all(20),
         child: SingleChildScrollView(
           child: Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             key: _key,
             child: Column(
               children: [
@@ -88,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('User Registration', style: TextStyle(fontSize: 30, color: Colors.blue, fontWeight: FontWeight.bold),),
                 SizedBox(height: 25,),
                 TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   focusNode: myFocusNode,
                   onSaved: (v){
                     fullname = v ?? '';
@@ -109,6 +107,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(height: 25,),
                 TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  focusNode: myFocusNode,
+                  onSaved: (v){
+                    username = v ?? '';
+                  },
+                  validator: (v){
+                    if(v  == null || v.isEmpty || v.length < 3)
+                    {
+                      return 'Please enter your username';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.name,
+                  decoration: InputDecoration(
+                    labelText: "Username",
+                    hintText: "Your username",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                ),
+                SizedBox(height: 25,),
+                TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                   onSaved: (v){
                     email = v?? '';
                   },
@@ -123,50 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(height: 25,),
                 TextFormField(
-                  onSaved: (v){
-                    age = v != null ? int.parse(v): 18;
-                  },
-                  validator: (v){
-                    if(v == null || v.isEmpty || int.parse(v) >= 300 || int.parse(v) < 0)
-                      {
-                        return "Please enter a valid age";
-                      }
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: "Age",
-                    hintText: "Age",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.numbers),
-                  ),
-                ),
-                SizedBox(height: 25,),
-                DropdownButtonFormField(
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      labelText: 'Country',
-                      border: OutlineInputBorder()
-                    ),
-                    items: countries.map((e) => DropdownMenuItem(value: e, child: Text(e)),).toList(),
-                    onChanged: (v) => {
-                      setState((){
-                          selectedItem = v!;
-                      })
-                    },
-                    onSaved: (v){
-                      country = v??'';
-                    },
-                    validator: (v){
-                      if(v == null || v.isEmpty)
-                        {
-                          return 'Please choose an option';
-                        }
-                      return null;
-                    },
-                ),
-                SizedBox(height: 25,),
-                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   onSaved: (v){
                     password = v??'';
                   },
