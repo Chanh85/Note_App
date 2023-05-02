@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:note_app/Screens/NoteListScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -32,6 +33,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       print(password);
       _key.currentState?.reset();
       myFocusNode.requestFocus();
+      Navigator.push(context,
+          MaterialPageRoute(builder: (ctx) => NoteListScreen()));
     }
     else
     {
@@ -59,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 SizedBox(height: 30,),
-                Text('User Registration', style: TextStyle(fontSize: 30, color: Colors.blue, fontWeight: FontWeight.bold),),
+                Text('Registration', style: TextStyle(fontSize: 30, color: Colors.purple, fontWeight: FontWeight.bold),),
                 SizedBox(height: 25,),
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
