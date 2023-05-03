@@ -79,6 +79,10 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     });
   }
 
+  void _showOptionNoteListScreen(context) async {
+
+  }
+
   void _showContextMenu(context, note) async{
     final RenderObject? overlay = Overlay.of(context).context.findRenderObject();
     final res = await showMenu(
@@ -133,7 +137,6 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
 
     if (data == null) return;
 
-    // int index = notes.indexWhere((e) => e['id'] == data['id']);
     int index = notes.indexWhere((element) => element['id'] == data['id']);
     if (index >= 0) {
       if (data['title'] != title ||
@@ -349,19 +352,77 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
         appBar: AppBar(
           title: Text('Note Management'),
           actions: [
-            IconButton(
-                onPressed: (){
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(Icons.logout)),
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  listView = !listView;
-                });
+            // IconButton(
+            //     onPressed: (){
+            //       showDialog(
+            //           context: context,
+            //           barrierDismissible: false,
+            //           builder: (ct) => AlertDialog(
+            //             title: Text('Logout?'),
+            //             content: Text('Are you sure want to logout?'),
+            //             actions: [
+            //               TextButton(
+            //                   onPressed: (){
+            //                     Navigator.popUntil(context, ModalRoute.withName('/'));
+            //                   },
+            //                   child: Text('Yes')
+            //               ),
+            //               TextButton(
+            //                   onPressed: (){Navigator.pop(context);},
+            //                   child: Text('No')
+            //               ),
+            //             ],
+            //           ));
+            //     },
+            //     icon: Icon(Icons.logout)),
+            // IconButton(
+            //   onPressed: () {
+            //     setState(() {
+            //       listView = !listView;
+            //     });
+            //   },
+            //   icon: Icon(listView ? Icons.grid_view : Icons.list),
+            // ),
+            PopupMenuButton(
+              onSelected: (value) {
+                if(value == 'changeview'){
+                  setState(() {
+                    listView = !listView;
+                  });
+                }
+                else if(value == 'logout')
+                  {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (ct) => AlertDialog(
+                        title: Text('Logout?'),
+                        content: Text('Are you sure want to logout?'),
+                        actions: [
+                          TextButton(
+                              onPressed: (){
+                                Navigator.popUntil(context, ModalRoute.withName('/'));
+                              },
+                              child: Text('Yes')
+                          ),
+                          TextButton(
+                              onPressed: (){Navigator.pop(context);},
+                              child: Text('No')
+                          ),
+                        ],
+                      ));
+                  }
               },
-              icon: Icon(listView ? Icons.grid_view : Icons.list),
-            )
+                itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'changeview',
+                  child: ListTile(leading: Icon(listView ? Icons.grid_view : Icons.list),
+                    title: Text(listView ? 'Grid view': 'List view'),), ),
+              PopupMenuItem(
+                value: 'logout',
+                  child: ListTile(leading: Icon(Icons.logout),
+              title: Text('Logout'),)),
+            ])
           ],
           automaticallyImplyLeading: false,
         ),

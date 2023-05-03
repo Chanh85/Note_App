@@ -48,7 +48,12 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isNewNote ? 'Create New Note' : 'Edit a Note'),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
+        actions: [IconButton(onPressed: () {
+          Row(children: [
+           
+          ],);
+        }, icon: Icon(Icons.more_vert)),
+        ],
       ),
       body: Container(
         padding: EdgeInsets.all(20),
