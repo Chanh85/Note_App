@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note_app/Screens/register_screen.dart';
+import 'package:note_app/Screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,9 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: const RegisterScreen(),
+      home: const LoginScreen(),
     );
   }
 }
-
-

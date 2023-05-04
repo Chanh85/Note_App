@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:note_app/Screens/NoteListScreen.dart';
+import 'package:note_app/Screens/register_screen.dart';
+import 'package:note_app/Screens/forget_password_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true;
 
   var _key = GlobalKey<FormState>();
@@ -25,9 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _handleSubmit() {
     if (_key.currentState?.validate() ?? false) {
       _key.currentState?.save();
-      print(fullname);
       print(username);
-      print(email);
       print(password);
       _key.currentState?.reset();
       myFocusNode.requestFocus();
@@ -38,16 +37,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  String fullname = '';
   String username = '';
-  String email = '';
   String password = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: Text('Login'),
       ),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -60,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   height: 30,
                 ),
                 Text(
-                  'Registration',
+                  'Login',
                   style: TextStyle(
                       fontSize: 30,
                       color: Colors.purple,
@@ -72,28 +69,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   focusNode: myFocusNode,
-                  onSaved: (v) {
-                    fullname = v ?? '';
-                  },
-                  validator: (v) {
-                    if (v == null || v.isEmpty || v.length < 3) {
-                      return 'Please enter your full name';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.name,
-                  decoration: InputDecoration(
-                    labelText: "Full name",
-                    hintText: "Your full name",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                ),
-                SizedBox(
-                  height: 25,
-                ),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   onSaved: (v) {
                     username = v ?? '';
                   },
@@ -109,25 +84,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hintText: "Your username",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person_4),
-                  ),
-                ),
-                SizedBox(
-                  height: 25,
-                ),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onSaved: (v) {
-                    email = v ?? '';
-                  },
-                  validator: (v) => EmailValidator.validate(v!)
-                      ? null
-                      : 'Please enter a valid email',
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    hintText: "Email",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
                   ),
                 ),
                 SizedBox(
@@ -178,7 +134,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: ElevatedButton.styleFrom(
                       minimumSize: Size.fromHeight(55)),
                   onPressed: _handleSubmit,
-                  child: Text('Sign Up'),
+                  child: Text('Login'),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Text.rich(
+                  TextSpan(
+                    text: "Don't have an account? ",
+                    children: [
+                      WidgetSpan(
+                        child: InkWell(
+                          onTap: () {},
+                          child: Text(
+                            "Register here",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      TextSpan(
+                        text: "  |  ",
+                      ),
+                      WidgetSpan(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (ctx) => ForgetPasswordScreen()));
+                          },
+                          child: Text(
+                            "Forget Password",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
