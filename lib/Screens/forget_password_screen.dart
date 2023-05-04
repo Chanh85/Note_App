@@ -19,8 +19,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       // Gửi yêu cầu đặt lại mật khẩu bằng cách gửi email và mã OTP ở đây
 
       // Chuyển đến màn hình OTP Verification
-      Navigator.push(context,
-          MaterialPageRoute(builder: (ctx) => OTPVerificationScreen()));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (ctx) => OTPVerificationScreen(
+                  email: email))); // Add email argument here
     }
   }
 

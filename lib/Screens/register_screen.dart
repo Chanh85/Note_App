@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:note_app/Screens/NoteListScreen.dart';
+import 'package:note_app/Screens/otp_register_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -32,7 +33,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _key.currentState?.reset();
       myFocusNode.requestFocus();
       Navigator.push(
-          context, MaterialPageRoute(builder: (ctx) => NoteListScreen()));
+          context,
+          MaterialPageRoute(
+              builder: (ctx) => OTPVerificationScreen(email: email)));
     } else {
       print('Invalid form');
     }
@@ -179,6 +182,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       minimumSize: Size.fromHeight(55)),
                   onPressed: _handleSubmit,
                   child: Text('Sign Up'),
+                ),
+                SizedBox(
+                  height: 30,
                 ),
               ],
             ),

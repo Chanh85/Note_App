@@ -145,7 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       WidgetSpan(
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (ctx) => RegisterScreen()));
+                          },
                           child: Text(
                             "Register here",
                             style: TextStyle(
