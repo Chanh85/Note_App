@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:note_app/Screens/LabeledScreen.dart';
 import 'AddNoteScreen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -18,21 +20,21 @@ class _NoteListScreenState extends State<NoteListScreen> {
       'title': 'Việt Nam khởi đầu tốt nhất lịch sử dự U20 châu Á',
       'content':
           'Lần đầu trong lịch sử 64 năm của giải U20 châu Á, Việt Nam thắng cả hai trận đầu tiên, trước Australia và Qatar.',
-      'lable': ''
+      'label': ''
     },
     {
       'id': '21343242434',
       'title': 'Truyền thông Indonesia khen U20 Việt Nam phi thường',
       'content':
           'Nhiều báo, đài Indonesia ngạc nhiên khi Việt Nam toàn thắng hai trận đầu ở bảng đấu khó tại vòng chung kết U20 châu Á 2023',
-      'lable': ''
+      'label': ''
     },
     {
       'id': 'sk20918340',
       'title': 'Hai nghi can cướp ngân hàng ở Sài Gòn bị bắt',
       'content':
           'Ngày 5/3, Trương Minh Thiện và đồng phạm Trương Vĩnh Xương, 34 tuổi, bị Công an TP HCM phối hợp Cục cảnh sát Hình sự (C02, Bộ Công an) bắt về hành vi Cướp tài sản. Trong đó, Thiện bị xác định vai trò cầm đầu. Khẩu súng người này sử dụng khi gây án là loại bắn đạn bi nhựa.',
-      'lable': ''
+      'label': ''
     },
     {
       'id': 'l091283-k29',
@@ -45,21 +47,21 @@ Cụ thể, cử phạt vi phạm hành chính không lập biên bản được
 Điều 56 cũng nêu ngoại lệ: Nếu vi phạm hành chính được phát hiện nhờ sử dụng phương tiện, thiết bị kỹ thuật, nghiệp vụ thì phải lập biên bản.
 
 Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250.000 đồng (cá nhân) mà vi phạm được phát hiện thông qua phương tiện, kỹ thuật, nghiệp vụ thì vẫn phải lập biên bản. Với trường hợp phát hiện vi phạm tại chỗ mà mức phạt dưới 250.000 đồng thì không cần lập biên bản.''',
-      'lable': ''
+      'label': ''
     },
     {
       'id': 'lkku0918230',
       'title': 'Cắt giảm nhân sự lan rộng trong ngành địa ốc',
       'content':
           'Công ty anh Hoàng làm việc có trụ sở tại quận 3, TP HCM, đã cắt giảm nhân sự từ cuối năm 2022 nhưng tình hình ngày càng trầm trọng hơn trong hơn 2 tháng đầu năm 2023. Từ tháng 1 đến tháng 2, bên cạnh số nhân viên bị công ty cho thôi việc còn có nhiều người chủ động xin nghỉ vì thu nhập bị cắt giảm mạnh không đủ trang trải cuộc sống. Hoàng cho hay hiện các phòng ban của công ty đều giảm nhân sự 50-70% do hoạt động đầu tư và bán hàng đều đình trệ.',
-      'lable': ''
+      'label': ''
     },
     {
       'id': '122098390245l',
       'title': 'Ngành vận tải biển qua thời hoàng kim',
       'content':
           'Khi nhìn về khả năng phục hồi đơn hàng của ngành gỗ, ông Trần Lam Sơn, Tổng giám đốc Thiên Minh - nhà xuất khẩu sang châu Âu - nhận thấy chi phí vận chuyển là một trong những cơ hội.',
-      'lable': ''
+      'label': ''
     },
     {
       'id': 'lkj9882901',
@@ -67,20 +69,27 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
           'Doanh nghiệp phát hành trái phiếu được kéo dài kỳ hạn thêm 2 năm',
       'content':
           'Cụ thể, trước đây doanh nghiệp không được thay đổi kỳ hạn trái phiếu đã phát hành, nhưng quy định mới sửa đổi cho phép kéo dài thời hạn của trái phiếu thêm tối đa 2 năm. Trong trường hợp trái chủ không đồng ý thay đổi này, doanh nghiệp "phải có trách nhiệm đàm phán để đảm bảo quyền lợi của nhà đầu tư". Nếu quá trình đàm phán vẫn không đạt kết quả như mong đợi, doanh nghiệp phải thực hiện nghĩa vụ với trái chủ theo phương án phát hành trái phiếu đã công bố.',
-      'lable': ''
+      'label': ''
     },
   ];
 
   bool listView = true;
-  var _passcontroller1 = TextEditingController();
-  var _passcontroller2 = TextEditingController();
+  late FocusNode myFocusNode;
+  String password = "";
+  String confirmPassword = "";
   bool validate = false;
   Offset _tapPos = Offset.zero;
   String selectedValue = 'Personal';
   var labelItems = ['Work', 'Personal', 'Family'];
+  var _key = GlobalKey<FormState>();
 
 
 
+  @override
+  void initState() {
+    super.initState();
+    myFocusNode = FocusNode();
+  }
 
   void _getTapPos(TapDownDetails tapPos){
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -141,14 +150,20 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                         selectedValue = v!;
                       });
                     });
-                    // Navigator.pop(context);
                   })).toList(),
             ),
             actions: [
               TextButton(
                   onPressed: (){
-                    note['lable'] = selectedValue;
-                    print(note['lable']);
+                    note['label'] = selectedValue;
+                    Fluttertoast.showToast(
+                        msg: "Note added to ${note['label']} label",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        textColor: Colors.white,
+                        fontSize: 16.0
+                    );
                     Navigator.pop(context);},
                   child: Text('OK')
               ),
@@ -159,23 +174,16 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
 
   bool _handleSubmit()
   {
-    setState(() {
-      if(_passcontroller1.text.isEmpty || _passcontroller2.text.isEmpty)
-      {
-        validate = true;
-      }
-      else
-      {
-        validate = false;
-        _passcontroller1.text = '';
-        _passcontroller2.text = '';
-      }
-    });
-    if(validate)
-      {
-        return false;
-      }
-    return true;
+    if (_key.currentState?.validate() ?? false) {
+      _key.currentState?.save();
+      print(password);
+      print(confirmPassword);
+      _key.currentState?.reset();
+      myFocusNode.requestFocus();
+    } else {
+      print('Invalid form');
+    }
+    return false;
   }
 
   void createOrUpdate([Map<String, dynamic>? note]) async {
@@ -213,47 +221,73 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
   }
 
     void _onProtect(note, lock, Actions action){
-      showDialog(
+       showDialog(
           context: context,
           barrierDismissible: false,
           builder: (ct) => AlertDialog(
+            insetPadding: EdgeInsets.all(20.0),
+            contentPadding: EdgeInsets.all(10.0),
             title: Text('Set password'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  autofocus: true,
-                  controller: _passcontroller1,
-                  maxLines: 1,
-                  maxLength: 30,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter password',
-                    border: OutlineInputBorder(),
-                    errorText: validate ? "Value can not be empty": null,
+            content: Form(
+              key: _key,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    focusNode: myFocusNode,
+                    onChanged: (v){
+                      password = v;
+                    },
+                    onSaved: (v) {
+                      password = v ?? '';
+                    },
+                    validator: (v) {
+                      var passNonNullValue = v ?? "";
+                      if (passNonNullValue.isEmpty) {
+                        return ("Password is required");
+                      } else if (passNonNullValue.length < 6) {
+                        return ("Password Must be more than 5 characters");
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      hintText: "Password",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.password),
+                    ),
                   ),
-                ),
-                TextField(
-                  controller: _passcontroller2,
-                  maxLines: 1,
-                  maxLength: 30,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm password',
-                    hintText: 'Confirm',
-                    border: OutlineInputBorder(),
-                    errorText: validate ? "Value can not be empty": null,
+                  SizedBox(
+                    height: 25,
                   ),
-                ),
-              ],
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    onSaved: (v) {
+                      confirmPassword = v ?? '';
+                    },
+                    validator: (v) {
+                      if (v == null || v.isEmpty || v.length < 3 || v != password) {
+                        return 'Password does not match';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.name,
+                    decoration: InputDecoration(
+                      labelText: "Confirm password",
+                      hintText: "Confirm password",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person_4),
+                    ),
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
                   onPressed: (){
                     _handleSubmit();
-                    // if(_handleSubmit())
-                    //   {
-                    //     Navigator.pop(context);
-                    //   }
                     Navigator.pop(context);
                   },
                   child: Text('Set')
@@ -264,13 +298,11 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
               ),
             ],
           ));
-
     setState(() {
       if(_handleSubmit()){
         note['lock'] = !lock;
       }
     });
-    print(note['title']);
   }
   void _onDelete(int index, Actions action){
     showDialog(
@@ -438,16 +470,16 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                   }
                 else if(value == 'View_label')
                   {
-                    //TODO: view label
                     showModalBottomSheet(
                         context: context,
                         builder: (ctx) =>ListView(
                           shrinkWrap: true,
                           children: labelItems.map((e) => ListTile(
-                            title: Text(e),
-                            onTap: (){
+                            title: Text(e, textAlign: TextAlign.center,),
+                            onTap: () async{
                               Navigator.pop(context);
-                              print(e);
+                              await Navigator.push(context,
+                                  MaterialPageRoute(builder: (ctx) => LabeledScreen(listview: listView, labelItems: labelItems, notes: notes, label: e)));
                             },
                           )).toList(),
                         )
