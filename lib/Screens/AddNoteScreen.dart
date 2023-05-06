@@ -48,7 +48,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     _note ??= {'id': ShortUuid().generate()};
     _note!['title'] = _title.text;
     _note!['content'] = _content.text;
-
+    _note!['dueDate'] = '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
     Navigator.pop(context, _note);
   }
 
@@ -72,14 +72,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isNewNote ? 'Create New Note' : 'Edit a Note'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Row(
-                  children: [],
-                );
-              },
-              icon: Icon(Icons.more_vert)),
+        actions: [IconButton(onPressed: () {
+          Row(children: [
+           
+          ],);
+        }, icon: Icon(Icons.more_vert)),
         ],
       ),
       body: Container(
@@ -128,22 +125,27 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
               },
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    Icon(
-                      Icons.calendar_today,
-                      color: Color.fromARGB(255, 166, 33, 243),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                      style: TextStyle(fontSize: 16),
+                    Text('Set due'),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          color: Color.fromARGB(255, 166, 33, 243),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -173,9 +175,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20,),
             ElevatedButton(
               onPressed: _createOrUpdateNote,
               child: Text(isNewNote ? 'Save Note' : 'Save all changes'),
