@@ -254,7 +254,7 @@ class _LabeledScreenState extends State<LabeledScreen> {
           itemBuilder: (ctx, idx) => _noteGridItem(_familyLabeledList[idx]),
           itemCount: _familyLabeledList.length,
         ),
-      ) : Container(child: Text("hi"),),
+      ) : Container(child: Text("Empty"),),
     );
   }
 }
