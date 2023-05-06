@@ -167,21 +167,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             SizedBox(height: 25),
             InkWell(
               onTap: _skipVerification,
-              child: Container(
-                height: 55,
-                width: double.infinity,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
+              child: Text(
+                'Skip',
+                style: TextStyle(
                   color: Theme.of(context).primaryColor,
-                ),
-                child: Text(
-                  'Skip',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
