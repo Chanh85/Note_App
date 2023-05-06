@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(runner LANGUAGES CXX)
 
+# Define the Firebase C++ SDK path
+set(FIREBASE_CPP_SDK_PATH "D:/Note_App/Note_App/firebase-cpp-sdk-11.0.0")
+
 # Define the application target. To change its name, change BINARY_NAME in the
 # top-level CMakeLists.txt, not the value here, or `flutter run` will no longer
 # work.
@@ -32,9 +35,18 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
 
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.
-target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app)
-target_link_libraries(${BINARY_NAME} PRIVATE "dwmapi.lib")
+target_link_libraries(${BINARY_NAME} PRIVATE flutter
+  flutter_wrapper_app
+  "dwmapi.lib"
+  firebase_app
+  firebase_auth
+  firebase_firestore
+  firebase_storage)
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
+
+# Include Firebase C++ SDK headers and libraries
+include_directories(${FIREBASE_CPP_SDK_PATH}/include)
+link_directories(${FIREBASE_CPP_SDK_PATH}/lib)
 
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)

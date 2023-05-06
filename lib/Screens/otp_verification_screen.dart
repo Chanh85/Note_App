@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
-import 'package:note_app/Screens/login_screen.dart';
 import 'package:note_app/Screens/resetpassword_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
-  final String email;
+  final String phoneNumber;
+  final String verificationId;
 
-  OTPVerificationScreen({required this.email});
+  OTPVerificationScreen({
+    required this.phoneNumber,
+    required this.verificationId,
+  });
 
   @override
   _OTPVerificationScreenState createState() => _OTPVerificationScreenState();
 }
 
 class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
-  void _handleSubmit() {
-    Navigator.push(context, MaterialPageRoute(builder: (ctx) => LoginScreen()));
-  }
+  void _navigateToResetPassword(PhoneAuthCredential credential) async {
+    // Sign in with the provided credential
+    try {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      print("Error signing in with the provided credential: $e");
+    }
 
-  void _navigateToResetPassword() {
+    // Navigate to the Reset Password screen
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (ctx) => ResetPasswordScreen(email: widget.email)));
+            builder: (ctx) =>
+                ResetPasswordScreen(phoneNumber: widget.phoneNumber)));
   }
 
   @override
@@ -38,7 +47,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Enter the verification code sent at ${widget.email}',
+              'Enter the verification code sent at ${widget.phoneNumber}',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -62,14 +71,11 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                 },
                 onCompleted: (pin) {
                   print("Completed: " + pin);
-                  _navigateToResetPassword();
+                  final credential = PhoneAuthProvider.credential(
+                      verificationId: widget.verificationId, smsCode: pin);
+                  _navigateToResetPassword(credential);
                 }),
             SizedBox(height: 25),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(55)),
-              onPressed: _handleSubmit,
-              child: Text('Verification'),
-            ),
           ],
         ),
       ),

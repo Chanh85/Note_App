@@ -3,10 +3,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:note_app/Screens/LabeledScreen.dart';
 import 'AddNoteScreen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
+import 'package:note_app/utils/ListNote.dart';
+import 'package:note_app/Screens/SettingsPage_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'DeletedNotesScreen.dart';
 
-enum Actions { protect, delete }
+enum Actions { protect, delete, removePassNote, unlockNote }
 
 class NoteListScreen extends StatefulWidget {
   const NoteListScreen({super.key});
@@ -16,75 +19,10 @@ class NoteListScreen extends StatefulWidget {
 }
 
 class _NoteListScreenState extends State<NoteListScreen> {
-  List<Map<String, dynamic>> notes = [
-    {
-      'id': 'kl3091j2j2',
-      'title': 'Việt Nam khởi đầu tốt nhất lịch sử dự U20 châu Á',
-      'content':
-          'Lần đầu trong lịch sử 64 năm của giải U20 châu Á, Việt Nam thắng cả hai trận đầu tiên, trước Australia và Qatar.',
-      'lable': '',
-      'pinned': false
-    },
-    {
-      'id': '21343242434',
-      'title': 'Truyền thông Indonesia khen U20 Việt Nam phi thường',
-      'content':
-          'Nhiều báo, đài Indonesia ngạc nhiên khi Việt Nam toàn thắng hai trận đầu ở bảng đấu khó tại vòng chung kết U20 châu Á 2023',
-      'lable': '',
-      'pinned': false
-    },
-    {
-      'id': 'sk20918340',
-      'title': 'Hai nghi can cướp ngân hàng ở Sài Gòn bị bắt',
-      'content':
-          'Ngày 5/3, Trương Minh Thiện và đồng phạm Trương Vĩnh Xương, 34 tuổi, bị Công an TP HCM phối hợp Cục cảnh sát Hình sự (C02, Bộ Công an) bắt về hành vi Cướp tài sản. Trong đó, Thiện bị xác định vai trò cầm đầu. Khẩu súng người này sử dụng khi gây án là loại bắn đạn bi nhựa.',
-      'lable': '',
-      'pinned': false
-    },
-    {
-      'id': 'l091283-k29',
-      'title': 'Phạt dưới 250.000 đồng, CSGT không cần lập biên bản',
-      'content':
-          '''Giải đáp vấn đề trên, luật sư Nguyễn Đại Hải (Công ty Luật TNHH Fanci) cho hay Điều 56 Luật Xử lý vi phạm hành chính 2012 có quy định về mức phạt tối thiểu để lập biên bản.
-
-Cụ thể, cử phạt vi phạm hành chính không lập biên bản được áp dụng trong 2 trường hợp: xử phạt cảnh cáo hoặc phạt tiền đến 250.000 đồng với cá nhân, 500.000 đồng với tổ chức. Trong cả hai trường hợp, quy định được áp dụng khi người có thẩm quyền xử phạt ra quyết định xử phạt vi phạm hành chính tại chỗ.
-
-Điều 56 cũng nêu ngoại lệ: Nếu vi phạm hành chính được phát hiện nhờ sử dụng phương tiện, thiết bị kỹ thuật, nghiệp vụ thì phải lập biên bản.
-
-Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250.000 đồng (cá nhân) mà vi phạm được phát hiện thông qua phương tiện, kỹ thuật, nghiệp vụ thì vẫn phải lập biên bản. Với trường hợp phát hiện vi phạm tại chỗ mà mức phạt dưới 250.000 đồng thì không cần lập biên bản.''',
-      'lable': '',
-      'pinned': false
-    },
-    {
-      'id': 'lkku0918230',
-      'title': 'Cắt giảm nhân sự lan rộng trong ngành địa ốc',
-      'content':
-          'Công ty anh Hoàng làm việc có trụ sở tại quận 3, TP HCM, đã cắt giảm nhân sự từ cuối năm 2022 nhưng tình hình ngày càng trầm trọng hơn trong hơn 2 tháng đầu năm 2023. Từ tháng 1 đến tháng 2, bên cạnh số nhân viên bị công ty cho thôi việc còn có nhiều người chủ động xin nghỉ vì thu nhập bị cắt giảm mạnh không đủ trang trải cuộc sống. Hoàng cho hay hiện các phòng ban của công ty đều giảm nhân sự 50-70% do hoạt động đầu tư và bán hàng đều đình trệ.',
-      'lable': '',
-      'pinned': false
-    },
-    {
-      'id': '122098390245l',
-      'title': 'Ngành vận tải biển qua thời hoàng kim',
-      'content':
-          'Khi nhìn về khả năng phục hồi đơn hàng của ngành gỗ, ông Trần Lam Sơn, Tổng giám đốc Thiên Minh - nhà xuất khẩu sang châu Âu - nhận thấy chi phí vận chuyển là một trong những cơ hội.',
-      'lable': '',
-      'pinned': false
-    },
-    {
-      'id': 'lkj9882901',
-      'title':
-          'Doanh nghiệp phát hành trái phiếu được kéo dài kỳ hạn thêm 2 năm',
-      'content':
-          'Cụ thể, trước đây doanh nghiệp không được thay đổi kỳ hạn trái phiếu đã phát hành, nhưng quy định mới sửa đổi cho phép kéo dài thời hạn của trái phiếu thêm tối đa 2 năm. Trong trường hợp trái chủ không đồng ý thay đổi này, doanh nghiệp "phải có trách nhiệm đàm phán để đảm bảo quyền lợi của nhà đầu tư". Nếu quá trình đàm phán vẫn không đạt kết quả như mong đợi, doanh nghiệp phải thực hiện nghĩa vụ với trái chủ theo phương án phát hành trái phiếu đã công bố.',
-      'lable': '',
-      'pinned': false
-    },
-  ];
-
-  List<Map<String, dynamic>> deletedNotes = [];
-
   bool listView = true;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  late String username;
   late FocusNode myFocusNode;
   String password = "";
   String confirmPassword = "";
@@ -94,18 +32,21 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
   var labelItems = ['Work', 'Personal', 'Family'];
   var _key = GlobalKey<FormState>();
   bool deleted = false;
+  List<Map<String, dynamic>> deletedNotes = [];
 
   @override
   void initState() {
     super.initState();
     myFocusNode = FocusNode();
+    _getUserData();
   }
 
-  void _getTapPos(TapDownDetails tapPos) {
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+  void _getUserData() async {
+    // Get the current user's data from Firestore
+    final user = _auth.currentUser;
+    final userData = await _firestore.collection('users').doc(user?.uid).get();
     setState(() {
-      _tapPos = renderBox.globalToLocal(tapPos.globalPosition);
-      print(_tapPos);
+      username = userData['username'];
     });
   }
 
@@ -115,7 +56,14 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     Navigator.pushNamed(context, '/deleted_notes', arguments: deletedNotes);
   }
 
-  void _showContextMenu(context, note) async {
+  void _getTapPos(TapDownDetails tapPos) {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPos = renderBox.globalToLocal(tapPos.globalPosition);
+    });
+  }
+
+  void _showContextMenu(context, note, lock) async {
     final RenderObject? overlay =
         Overlay.of(context).context.findRenderObject();
     final res = await showMenu(
@@ -124,35 +72,79 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
             Rect.fromLTWH(_tapPos.dx, _tapPos.dy, 10, 10),
             Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
                 overlay.paintBounds.size.height)),
-        items: [
-          PopupMenuItem(
-            value: 'delete',
-            child: ListTile(
-              leading: Icon(Icons.delete),
-              title: Text('Delete'),
-            ),
-          ),
-          PopupMenuItem(
-            value: 'label',
-            child: ListTile(
-              leading: Icon(Icons.label_outline),
-              title: Text('Label'),
-            ),
-          ),
-          PopupMenuItem(
-            value: 'pinned',
-            child: ListTile(
-              leading: Icon(Icons.push_pin),
-              title: Text('Pin'),
-            ),
-          ),
-        ]);
+        items: lock
+            ? [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text('Delete'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'label',
+                  child: ListTile(
+                    leading: Icon(Icons.label_outline),
+                    title: Text('Label'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'RemovePass',
+                  child: ListTile(
+                    leading: Icon(Icons.remove),
+                    title: Text('Remove password'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'pinned',
+                  child: ListTile(
+                    leading: Icon(Icons.push_pin),
+                    title: Text('Pin'),
+                  ),
+                ),
+              ]
+            : [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text('Delete'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'label',
+                  child: ListTile(
+                    leading: Icon(Icons.label_outline),
+                    title: Text('Label'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'setPass',
+                  child: ListTile(
+                    leading: Icon(Icons.password),
+                    title: Text('Set Password'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'pinned',
+                  child: ListTile(
+                    leading: Icon(Icons.push_pin),
+                    title: Text('Pin'),
+                  ),
+                ),
+              ]);
     switch (res) {
       case 'delete':
         _onDelete(notes.indexOf(note), Actions.delete);
         break;
       case 'label':
         _label(note);
+        break;
+      case 'setPass':
+        _onProtect(note, lock, Actions.protect);
+        break;
+      case 'RemovePass':
+        _onProtect(note, lock, Actions.removePassNote);
         break;
       case 'pinned':
         setState(() {
@@ -173,64 +165,128 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
 
   void _label(note) async {
     showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-          builder: (ctx, setDialogState) => AlertDialog(
-                  title: Text('Choose label'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: labelItems
-                        .map((e) => RadioListTile(
-                            title: Text(e),
-                            value: e,
-                            groupValue: selectedValue,
-                            onChanged: (v) {
-                              setState(() {
-                                setDialogState(() {
-                                  selectedValue = v!;
-                                });
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+              builder: (ctx, setDialogState) => AlertDialog(
+                title: Text('Choose label'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: labelItems
+                      .map((e) => RadioListTile(
+                          title: Text(e),
+                          value: e,
+                          groupValue: selectedValue,
+                          onChanged: (v) {
+                            setState(() {
+                              setDialogState(() {
+                                selectedValue = v!;
                               });
-                            }))
-                        .toList(),
-                  ),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          note['label'] = selectedValue;
-                          Fluttertoast.showToast(
-                              msg: "Note added to ${note['label']} label",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
-                          Navigator.pop(context);
-                        },
-                        child: Text('OK')),
-                  ])),
-    );
+                            });
+                          }))
+                      .toList(),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        note['label'] = selectedValue;
+                        Fluttertoast.showToast(
+                            msg: "Note added to ${note['label']} label",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK')),
+                ],
+              ),
+            ));
   }
 
   bool isPinned(Map<String, dynamic> note) {
     return note['pinned'] ?? false;
   }
 
-  bool _handleSubmit() {
-    if (_key.currentState?.validate() ?? false) {
-      _key.currentState?.save();
-      print(password);
-      print(confirmPassword);
-      _key.currentState?.reset();
-      myFocusNode.requestFocus();
-    } else {
-      print('Invalid form');
+  void _handleSubmit(note, lock, action) {
+    if (action == Actions.protect) {
+      if (_key.currentState?.validate() ?? false) {
+        _key.currentState?.save();
+        note['password'] = confirmPassword;
+        setState(() {
+          note['lock'] = !lock;
+        });
+        Fluttertoast.showToast(
+            msg: "Password set!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        print(note['lock']);
+        _key.currentState?.reset();
+        myFocusNode.requestFocus();
+      } else {
+        print('Invalid form');
+      }
     }
-    return false;
+    if (action == Actions.removePassNote) {
+      if (_key.currentState?.validate() ?? false) {
+        _key.currentState?.save();
+        print(password);
+        if (password == note['password']) {
+          note['password'] = '';
+          setState(() {
+            note['lock'] = !lock;
+          });
+          Fluttertoast.showToast(
+              msg: "Password removed!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Wrong password!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        _key.currentState?.reset();
+        myFocusNode.requestFocus();
+      } else {
+        print('Invalid form');
+      }
+    }
+    if (action == Actions.unlockNote) {
+      if (_key.currentState?.validate() ?? false) {
+        _key.currentState?.save();
+        if (password == note['password']) {
+          createOrUpdate(note);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Wrong password!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        _key.currentState?.reset();
+        myFocusNode.requestFocus();
+      } else {
+        print('Invalid form');
+      }
+    }
   }
 
   void createOrUpdate([Map<String, dynamic>? note]) async {
     String title = note?['title'] ?? '';
     String content = note?['content'] ?? '';
+    String dueDate = note?['dueDate'] ?? '';
 
     var data = await Navigator.push(context,
         MaterialPageRoute(builder: (ctx) => AddNoteScreen(note: note)));
@@ -239,7 +295,9 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
 
     int index = notes.indexWhere((element) => element['id'] == data['id']);
     if (index >= 0) {
-      if (data['title'] != title || data['content'] != content) {
+      if (data['title'] != title ||
+          data['content'] != content ||
+          data['dueDate'] != dueDate) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Note has been updated'),
@@ -262,91 +320,200 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
   }
 
   void _onProtect(note, lock, Actions action) {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ct) => AlertDialog(
-              insetPadding: EdgeInsets.all(20.0),
-              contentPadding: EdgeInsets.all(10.0),
-              title: Text('Set password'),
-              content: Form(
-                key: _key,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      focusNode: myFocusNode,
-                      onChanged: (v) {
-                        password = v;
-                      },
-                      onSaved: (v) {
-                        password = v ?? '';
-                      },
-                      validator: (v) {
-                        var passNonNullValue = v ?? "";
-                        if (passNonNullValue.isEmpty) {
-                          return ("Password is required");
-                        } else if (passNonNullValue.length < 6) {
-                          return ("Password Must be more than 5 characters");
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        hintText: "Password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.password),
+    if (action == Actions.protect) {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ct) => AlertDialog(
+                insetPadding: EdgeInsets.all(20.0),
+                contentPadding: EdgeInsets.all(10.0),
+                title: Text('Set password'),
+                content: Form(
+                  key: _key,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        focusNode: myFocusNode,
+                        onChanged: (v) {
+                          password = v;
+                        },
+                        onSaved: (v) {
+                          password = v ?? '';
+                        },
+                        validator: (v) {
+                          var passNonNullValue = v ?? "";
+                          if (passNonNullValue.isEmpty) {
+                            return ("Password is required");
+                          } else if (passNonNullValue.length < 6) {
+                            return ("Password Must be more than 5 characters");
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          hintText: "Password",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.password),
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 25,
-                    ),
-                    TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (v) {
-                        confirmPassword = v ?? '';
-                      },
-                      validator: (v) {
-                        if (v == null ||
-                            v.isEmpty ||
-                            v.length < 3 ||
-                            v != password) {
-                          return 'Password does not match';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        labelText: "Confirm password",
-                        hintText: "Confirm password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person_4),
+                      SizedBox(
+                        height: 25,
                       ),
-                    ),
-                  ],
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        onSaved: (v) {
+                          confirmPassword = v ?? '';
+                        },
+                        validator: (v) {
+                          if (v == null ||
+                              v.isEmpty ||
+                              v.length < 3 ||
+                              v != password) {
+                            return 'Password does not match';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                          labelText: "Confirm password",
+                          hintText: "Confirm password",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.person_4),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      _handleSubmit();
-                      Navigator.pop(context);
-                    },
-                    child: Text('Set')),
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('Cancel')),
-              ],
-            ));
-    setState(() {
-      if (_handleSubmit()) {
-        note['lock'] = !lock;
-      }
-    });
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        _handleSubmit(note, lock, action);
+                        Navigator.pop(context);
+                      },
+                      child: Text('Set')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Cancel')),
+                ],
+              ));
+    } else if (action == Actions.removePassNote) {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ct) => AlertDialog(
+                insetPadding: EdgeInsets.all(20.0),
+                contentPadding: EdgeInsets.all(10.0),
+                title: Text('Enter password'),
+                content: Form(
+                  key: _key,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        focusNode: myFocusNode,
+                        onChanged: (v) {
+                          password = v;
+                        },
+                        onSaved: (v) {
+                          password = v ?? '';
+                        },
+                        validator: (v) {
+                          var passNonNullValue = v ?? "";
+                          if (passNonNullValue.isEmpty) {
+                            return ("Password is required");
+                          } else if (passNonNullValue.length < 6) {
+                            return ("Password Must be more than 5 characters");
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          hintText: "Password",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.password),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        _handleSubmit(note, lock, action);
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Cancel')),
+                ],
+              ));
+    } else if (action == Actions.unlockNote) {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ct) => AlertDialog(
+                insetPadding: EdgeInsets.all(20.0),
+                contentPadding: EdgeInsets.all(10.0),
+                title: Text('Enter password'),
+                content: Form(
+                  key: _key,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        focusNode: myFocusNode,
+                        onChanged: (v) {
+                          password = v;
+                        },
+                        onSaved: (v) {
+                          password = v ?? '';
+                        },
+                        validator: (v) {
+                          var passNonNullValue = v ?? "";
+                          if (passNonNullValue.isEmpty) {
+                            return ("Password is required");
+                          } else if (passNonNullValue.length < 6) {
+                            return ("Password Must be more than 5 characters");
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          hintText: "Password",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.password),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _handleSubmit(note, lock, action);
+                      },
+                      child: Text('OK')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Cancel')),
+                ],
+              ));
+    }
   }
 
   void _onDelete(int index, Actions action) {
@@ -376,18 +543,21 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
   }
 
   Widget _noteGridItem(note) {
+    bool lock = note['lock'] ?? false;
     return GestureDetector(
       onTap: () {
-        createOrUpdate(note);
+        lock
+            ? _onProtect(note, lock, Actions.unlockNote)
+            : createOrUpdate(note);
       },
       onTapDown: (position) {
         _getTapPos(position);
       },
       onLongPress: () {
-        _showContextMenu(context, note);
+        _showContextMenu(context, note, lock);
       },
       child: Card(
-        color: Colors.yellow.shade300,
+        color: lock ? Colors.lightGreen : Colors.yellow.shade300,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(children: [
@@ -403,6 +573,17 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
             ),
             SizedBox(
               height: 8,
+            ),
+            Text(
+              'Due: ${note['dueDate']}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ),
+            SizedBox(
+              height: 15,
             ),
             Text(
               note['content'],
@@ -423,35 +604,40 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
       startActionPane: ActionPane(
         motion: const StretchMotion(),
         children: [
-          SlidableAction(
-              backgroundColor: Colors.lightBlue,
-              icon: Icons.lock,
-              label: 'Protect',
-              onPressed: (context) => _onProtect(note, lock, Actions.protect)),
+          lock
+              ? SlidableAction(
+                  backgroundColor: Colors.lightBlue,
+                  icon: Icons.lock,
+                  label: 'Remove password',
+                  onPressed: (context) =>
+                      _onProtect(note, lock, Actions.removePassNote))
+              : SlidableAction(
+                  backgroundColor: Colors.lightBlue,
+                  icon: Icons.lock,
+                  label: 'Set password',
+                  onPressed: (context) =>
+                      _onProtect(note, lock, Actions.protect)),
           SlidableAction(
               backgroundColor: Colors.lightGreenAccent,
               icon: Icons.label_outline,
               label: 'Label',
               onPressed: (context) => _label(note)),
           SlidableAction(
-            backgroundColor: Color.fromARGB(255, 248, 151, 5),
-            icon: isPinned(note) ? (Icons.push_pin) : (Icons.push_pin_outlined),
-            label: 'Pin',
-            onPressed: (context) {
-              setState(() {
-                if (isPinned(note)) {
-                  note['pinned'] = false;
-                } else {
-                  note['pinned'] = true;
-                  // Move the pinned note to the top of the list.
-                  notes.remove(note);
-                  notes.insert(0, note);
-                }
-                // Save the updated notes list to the database.
-                // ...
-              });
-            },
-          )
+              backgroundColor: Color.fromARGB(255, 248, 151, 5),
+              icon:
+                  isPinned(note) ? (Icons.push_pin) : (Icons.push_pin_outlined),
+              label: 'Pin',
+              onPressed: (context) {
+                setState(() {
+                  if (isPinned(note)) {
+                    note['pinned'] = false;
+                  } else {
+                    note['pinned'] = true;
+                    notes.remove(note);
+                    notes.insert(0, note);
+                  }
+                });
+              })
         ],
       ),
       endActionPane: ActionPane(
@@ -469,22 +655,40 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
       child: ListTile(
         leading: Icon(Icons.newspaper),
         onTap: () {
-          createOrUpdate(note);
+          lock
+              ? _onProtect(note, lock, Actions.unlockNote)
+              : createOrUpdate(note);
         },
         trailing: lock ? Icon(Icons.lock) : null,
-        title: Text(
-          note['title'],
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              color: Color.fromARGB(255, 133, 34, 4),
-              fontSize: 16,
-              fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            Text(
+              note['title'],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: Color.fromARGB(255, 133, 34, 4),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            Text(
+              'Due: ${note['dueDate']}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
         subtitle: Text(
           note['content'],
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.start,
         ),
       ),
     );
@@ -506,9 +710,7 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
           actions: [
             IconButton(
               icon: Icon(Icons.search),
-              onPressed: () {
-                
-              },
+              onPressed: () {},
             ),
             PopupMenuButton(
               onSelected: (value) {
@@ -575,6 +777,13 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
+                  value: 'username',
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(username),
+                  ),
+                ),
+                PopupMenuItem(
                   value: 'changeview',
                   child: ListTile(
                     leading: Icon(listView ? Icons.grid_view : Icons.list),
@@ -598,6 +807,27 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                     child: ListTile(
                       leading: Icon(Icons.label_important_outlined),
                       title: Text('View labeled items'),
+                    )),
+                PopupMenuItem(
+                  value: 'settings',
+                  child: ListTile(
+                    leading: Icon(Icons.settings),
+                    onTap: () {
+                      Navigator.of(context).pop(); // Close the popup menu
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => SettingsPage(),
+                        ),
+                      );
+                    },
+                    title: Text('Settings'),
+                  ),
+                ),
+                PopupMenuItem(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
                     )),
               ],
             )

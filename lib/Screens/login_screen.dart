@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:note_app/Screens/NoteListScreen.dart';
 import 'package:note_app/Screens/register_screen.dart';
 import 'package:note_app/Screens/forget_password_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true;
-
+  String _errorMessage = '';
   var _key = GlobalKey<FormState>();
 
   late FocusNode myFocusNode;
@@ -23,21 +24,38 @@ class _LoginScreenState extends State<LoginScreen> {
     myFocusNode = FocusNode();
   }
 
-  void _handleSubmit() {
+  void _handleSubmit() async {
     if (_key.currentState?.validate() ?? false) {
       _key.currentState?.save();
-      print(username);
-      print(password);
-      _key.currentState?.reset();
-      myFocusNode.requestFocus();
-      Navigator.push(
-          context, MaterialPageRoute(builder: (ctx) => NoteListScreen()));
+
+      try {
+        // Xác thực người dùng với Firebase
+        UserCredential userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
+
+        // Đăng nhập thành công
+        _errorMessage = '';
+        _key.currentState?.reset();
+        myFocusNode.requestFocus();
+        Navigator.push(
+            context, MaterialPageRoute(builder: (ctx) => NoteListScreen()));
+      } on FirebaseAuthException catch (e) {
+        // Xử lý lỗi đăng nhập
+        if (e.code == 'user-not-found') {
+          _errorMessage = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          _errorMessage = 'Wrong password provided.';
+        } else {
+          _errorMessage = 'An error occurred during login.';
+        }
+        setState(() {});
+      }
     } else {
       print('Invalid form');
     }
   }
 
-  String username = '';
+  String email = '';
   String password = '';
 
   @override
@@ -70,20 +88,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   focusNode: myFocusNode,
                   onSaved: (v) {
-                    username = v ?? '';
+                    email = v ?? '';
                   },
                   validator: (v) {
-                    if (v == null || v.isEmpty || v.length < 3) {
-                      return 'Please enter your username';
+                    if (v == null || v.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    // Regex to validate email format
+                    RegExp regex =
+                        RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,}$');
+                    if (!regex.hasMatch(v)) {
+                      return 'Please enter a valid email';
                     }
                     return null;
                   },
-                  keyboardType: TextInputType.name,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: "Username",
-                    hintText: "Your username",
+                    labelText: "Email",
+                    hintText: "Your email",
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person_4),
+                    prefixIcon: Icon(Icons.email),
                   ),
                 ),
                 SizedBox(
@@ -103,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     } else if (passNonNullValue.length < 6) {
                       return ("Password Must be more than 5 characters");
                     } else if (!regex.hasMatch(passNonNullValue)) {
-                      return ("Password should contain upper,lower,digit and Special character ");
+                      return ("Password should contain upper, lower,digit, and special character");
                     }
                     return null;
                   },
@@ -127,6 +151,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             : Icons.visibility_off)),
                   ),
                 ),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      _errorMessage,
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                  ),
                 SizedBox(
                   height: 25,
                 ),
@@ -161,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       TextSpan(
-                        text: "  |  ",
+                        text: " | ",
                       ),
                       WidgetSpan(
                         child: InkWell(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/Screens/otp_verification_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({Key? key}) : super(key: key);
@@ -10,20 +11,62 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  String email = '';
+  String phoneNumber = '';
+  String _verificationId = '';
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print(email);
-      // Gửi yêu cầu đặt lại mật khẩu bằng cách gửi email và mã OTP ở đây
-
-      // Chuyển đến màn hình OTP Verification
-      Navigator.push(
-          context,
-          MaterialPageRoute(
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Hàm này sẽ được gọi khi xác minh tự động hoàn tất
+          try {
+            await FirebaseAuth.instance.signInWithCredential(credential);
+            // Lưu trữ verificationId để kiểm tra mã OTP sau
+            setState(() {
+              _verificationId = credential.verificationId!;
+            });
+            // Chuyển đến màn hình OTP Verification
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (ctx) => OTPVerificationScreen(
+                  phoneNumber: phoneNumber,
+                  verificationId: _verificationId,
+                ),
+              ),
+            );
+          } catch (e) {
+            print('Error with auto-verification: $e');
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          // Xử lý lỗi xác minh tại đây
+          print('Verification failed: ${e.message}');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          // Lưu trữ verificationId để kiểm tra mã OTP sau
+          setState(() {
+            _verificationId = verificationId;
+          });
+          // Chuyển đến màn hình OTP Verification
+          Navigator.push(
+            context,
+            MaterialPageRoute(
               builder: (ctx) => OTPVerificationScreen(
-                  email: email))); // Add email argument here
+                phoneNumber: phoneNumber,
+                verificationId: _verificationId,
+              ),
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Hàm này sẽ được gọi khi hết thời gian tự động lấy mã
+          print('Auto-retrieval timeout: $verificationId');
+        },
+      );
     }
   }
 
@@ -54,26 +97,26 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   height: 25,
                 ),
                 TextFormField(
+                  initialValue: '+84',
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   onSaved: (value) {
-                    email = value ?? '';
+                    phoneNumber = value ?? '';
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return 'Please enter your phone number';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(value)) {
-                      return 'Please enter a valid email';
+                    if (!RegExp(r'^(\+\d{1,3}[- ]?)?\d{10}$').hasMatch(value)) {
+                      return 'Please enter a valid phone number';
                     }
                     return null;
                   },
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: "Email",
-                    hintText: "Your email",
+                    labelText: "Phone Number",
+                    hintText: "Your phone number",
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: Icon(Icons.phone),
                   ),
                 ),
                 SizedBox(

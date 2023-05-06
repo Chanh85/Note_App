@@ -69,6 +69,17 @@ class _LabeledScreenState extends State<LabeledScreen> {
               height: 8,
             ),
             Text(
+              'Due: ${note['dueDate']}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text(
               note['content'],
               maxLines: 5,
               textAlign: TextAlign.justify,
@@ -87,14 +98,27 @@ class _LabeledScreenState extends State<LabeledScreen> {
             onTap: () {
             },
             trailing: lock? Icon(Icons.lock): null,
-            title: Text(
-              note['title'],
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: Color.fromARGB(255, 133, 34, 4),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+            title: Row(
+              children: [
+                Text(
+                  note['title'],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 133, 34, 4),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(width: 15,),
+                Text(
+                  'Due: ${note['dueDate']}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
             subtitle: Text(
               note['content'],
