@@ -4,6 +4,8 @@ import 'package:note_app/Screens/LabeledScreen.dart';
 import 'AddNoteScreen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import 'DeletedNotesScreen.dart';
+
 enum Actions { protect, delete }
 
 class NoteListScreen extends StatefulWidget {
@@ -80,6 +82,8 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     },
   ];
 
+  List<Map<String, dynamic>> deletedNotes = [];
+
   bool listView = true;
   late FocusNode myFocusNode;
   String password = "";
@@ -89,8 +93,7 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
   String selectedValue = 'Personal';
   var labelItems = ['Work', 'Personal', 'Family'];
   var _key = GlobalKey<FormState>();
-
-
+  bool deleted = false;
 
   @override
   void initState() {
@@ -98,12 +101,18 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     myFocusNode = FocusNode();
   }
 
-  void _getTapPos(TapDownDetails tapPos){
+  void _getTapPos(TapDownDetails tapPos) {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     setState(() {
       _tapPos = renderBox.globalToLocal(tapPos.globalPosition);
       print(_tapPos);
     });
+  }
+
+  void _navigateToDeletedNotesScreen() {
+    List<Map<String, dynamic>> deletedNotes =
+        notes.where((note) => note['deleted'] == true).toList();
+    Navigator.pushNamed(context, '/deleted_notes', arguments: deletedNotes);
   }
 
   void _showContextMenu(context, note) async {
@@ -154,7 +163,6 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
             // Move the pinned note to the top of the list.
             notes.remove(note);
             notes.insert(0, note);
-            
           }
           // Save the updated notes list to the database.
           // ...
@@ -165,95 +173,49 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
 
   void _label(note) async {
     showDialog(
-        context: context,
-        builder: (ctx) => StatefulBuilder(
-<<<<<<< HEAD
-              builder: (ctx, setDialogState) => AlertDialog(
-                title: Text('Choose label'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: labelItems
-                      .map((e) => RadioListTile(
-                          title: Text(e),
-                          value: e,
-                          groupValue: selectedValue,
-                          onChanged: (v) {
-                            setState(() {
-                              setDialogState(() {
-                                selectedValue = v!;
-                              });
-                            });
-                            // Navigator.pop(context);
-                          }))
-                      .toList(),
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        note['lable'] = selectedValue;
-                        print(note['lable']);
-                        Navigator.pop(context);
-                      },
-                      child: Text('OK')),
-                ],
-=======
+      context: context,
+      builder: (ctx) => StatefulBuilder(
           builder: (ctx, setDialogState) => AlertDialog(
-            title: Text('Choose label'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: labelItems.map((e) => RadioListTile(
-                title: Text(e),
-                  value: e,
-                  groupValue: selectedValue,
-                  onChanged: (v){
-                    setState(() {
-                      setDialogState((){
-                        selectedValue = v!;
-                      });
-                    });
-                  })).toList(),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: (){
-                    note['label'] = selectedValue;
-                    Fluttertoast.showToast(
-                        msg: "Note added to ${note['label']} label",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                    Navigator.pop(context);},
-                  child: Text('OK')
->>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
-              ),
-            ));
+                  title: Text('Choose label'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: labelItems
+                        .map((e) => RadioListTile(
+                            title: Text(e),
+                            value: e,
+                            groupValue: selectedValue,
+                            onChanged: (v) {
+                              setState(() {
+                                setDialogState(() {
+                                  selectedValue = v!;
+                                });
+                              });
+                            }))
+                        .toList(),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          note['label'] = selectedValue;
+                          Fluttertoast.showToast(
+                              msg: "Note added to ${note['label']} label",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          Navigator.pop(context);
+                        },
+                        child: Text('OK')),
+                  ])),
+    );
   }
 
-<<<<<<< HEAD
   bool isPinned(Map<String, dynamic> note) {
     return note['pinned'] ?? false;
   }
 
   bool _handleSubmit() {
-    setState(() {
-      if (_passcontroller1.text.isEmpty || _passcontroller2.text.isEmpty) {
-        validate = true;
-      } else {
-        validate = false;
-        _passcontroller1.text = '';
-        _passcontroller2.text = '';
-      }
-    });
-    if (validate) {
-      return false;
-    }
-    return true;
-=======
-  bool _handleSubmit()
-  {
     if (_key.currentState?.validate() ?? false) {
       _key.currentState?.save();
       print(password);
@@ -264,7 +226,6 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
       print('Invalid form');
     }
     return false;
->>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
   }
 
   void createOrUpdate([Map<String, dynamic>? note]) async {
@@ -300,49 +261,77 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     }
   }
 
-<<<<<<< HEAD
   void _onProtect(note, lock, Actions action) {
     showDialog(
         context: context,
         barrierDismissible: false,
         builder: (ct) => AlertDialog(
+              insetPadding: EdgeInsets.all(20.0),
+              contentPadding: EdgeInsets.all(10.0),
               title: Text('Set password'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    autofocus: true,
-                    controller: _passcontroller1,
-                    maxLines: 1,
-                    maxLength: 30,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'Enter password',
-                      border: OutlineInputBorder(),
-                      errorText: validate ? "Value can not be empty" : null,
+              content: Form(
+                key: _key,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      focusNode: myFocusNode,
+                      onChanged: (v) {
+                        password = v;
+                      },
+                      onSaved: (v) {
+                        password = v ?? '';
+                      },
+                      validator: (v) {
+                        var passNonNullValue = v ?? "";
+                        if (passNonNullValue.isEmpty) {
+                          return ("Password is required");
+                        } else if (passNonNullValue.length < 6) {
+                          return ("Password Must be more than 5 characters");
+                        }
+                        return null;
+                      },
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        hintText: "Password",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.password),
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: _passcontroller2,
-                    maxLines: 1,
-                    maxLength: 30,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm password',
-                      hintText: 'Confirm',
-                      border: OutlineInputBorder(),
-                      errorText: validate ? "Value can not be empty" : null,
+                    SizedBox(
+                      height: 25,
                     ),
-                  ),
-                ],
+                    TextFormField(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onSaved: (v) {
+                        confirmPassword = v ?? '';
+                      },
+                      validator: (v) {
+                        if (v == null ||
+                            v.isEmpty ||
+                            v.length < 3 ||
+                            v != password) {
+                          return 'Password does not match';
+                        }
+                        return null;
+                      },
+                      keyboardType: TextInputType.name,
+                      decoration: InputDecoration(
+                        labelText: "Confirm password",
+                        hintText: "Confirm password",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person_4),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
                     onPressed: () {
                       _handleSubmit();
-                      // if(_handleSubmit())
-                      //   {
-                      //     Navigator.pop(context);
-                      //   }
                       Navigator.pop(context);
                     },
                     child: Text('Set')),
@@ -353,87 +342,6 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                     child: Text('Cancel')),
               ],
             ));
-
-=======
-    void _onProtect(note, lock, Actions action){
-       showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (ct) => AlertDialog(
-            insetPadding: EdgeInsets.all(20.0),
-            contentPadding: EdgeInsets.all(10.0),
-            title: Text('Set password'),
-            content: Form(
-              key: _key,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    focusNode: myFocusNode,
-                    onChanged: (v){
-                      password = v;
-                    },
-                    onSaved: (v) {
-                      password = v ?? '';
-                    },
-                    validator: (v) {
-                      var passNonNullValue = v ?? "";
-                      if (passNonNullValue.isEmpty) {
-                        return ("Password is required");
-                      } else if (passNonNullValue.length < 6) {
-                        return ("Password Must be more than 5 characters");
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      hintText: "Password",
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.password),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    onSaved: (v) {
-                      confirmPassword = v ?? '';
-                    },
-                    validator: (v) {
-                      if (v == null || v.isEmpty || v.length < 3 || v != password) {
-                        return 'Password does not match';
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.name,
-                    decoration: InputDecoration(
-                      labelText: "Confirm password",
-                      hintText: "Confirm password",
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person_4),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: (){
-                    _handleSubmit();
-                    Navigator.pop(context);
-                  },
-                  child: Text('Set')
-              ),
-              TextButton(
-                  onPressed: (){Navigator.pop(context);},
-                  child: Text('Cancel')
-              ),
-            ],
-          ));
->>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
     setState(() {
       if (_handleSubmit()) {
         note['lock'] = !lock;
@@ -452,6 +360,7 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                 TextButton(
                     onPressed: () {
                       setState(() {
+                        deletedNotes.add(notes[index]);
                         notes.removeAt(index);
                       });
                       Navigator.pop(context);
@@ -595,6 +504,12 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
         appBar: AppBar(
           title: Text('Note Management'),
           actions: [
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                
+              },
+            ),
             PopupMenuButton(
               onSelected: (value) {
                 if (value == 'changeview') {
@@ -606,7 +521,6 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                       context: context,
                       barrierDismissible: false,
                       builder: (ct) => AlertDialog(
-<<<<<<< HEAD
                             title: Text('Logout?'),
                             content: Text('Are you sure want to logout?'),
                             actions: [
@@ -623,58 +537,41 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                                   child: Text('No')),
                             ],
                           ));
+                } else if (value == 'trash_can') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DeletedNotesScreen(
+                        notes: deletedNotes,
+                      ),
+                    ),
+                  );
                 } else if (value == 'View_label') {
-                  //TODO: view label
                   showModalBottomSheet(
                       context: context,
                       builder: (ctx) => ListView(
                             shrinkWrap: true,
                             children: labelItems
                                 .map((e) => ListTile(
-                                      title: Text(e),
-                                      onTap: () {
+                                      title: Text(
+                                        e,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      onTap: () async {
                                         Navigator.pop(context);
-                                        print(e);
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (ctx) => LabeledScreen(
+                                                    listview: listView,
+                                                    labelItems: labelItems,
+                                                    notes: notes,
+                                                    label: e)));
                                       },
                                     ))
                                 .toList(),
                           ));
                 }
-=======
-                        title: Text('Logout?'),
-                        content: Text('Are you sure want to logout?'),
-                        actions: [
-                          TextButton(
-                              onPressed: (){
-                                Navigator.popUntil(context, ModalRoute.withName('/'));
-                              },
-                              child: Text('Yes')
-                          ),
-                          TextButton(
-                              onPressed: (){Navigator.pop(context);},
-                              child: Text('No')
-                          ),
-                        ],
-                      ));
-                  }
-                else if(value == 'View_label')
-                  {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (ctx) =>ListView(
-                          shrinkWrap: true,
-                          children: labelItems.map((e) => ListTile(
-                            title: Text(e, textAlign: TextAlign.center,),
-                            onTap: () async{
-                              Navigator.pop(context);
-                              await Navigator.push(context,
-                                  MaterialPageRoute(builder: (ctx) => LabeledScreen(listview: listView, labelItems: labelItems, notes: notes, label: e)));
-                            },
-                          )).toList(),
-                        )
-                    );
-                  }
->>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
@@ -689,6 +586,12 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                     child: ListTile(
                       leading: Icon(Icons.logout),
                       title: Text('Logout'),
+                    )),
+                PopupMenuItem(
+                    value: 'trash_can',
+                    child: ListTile(
+                      leading: Icon(Icons.delete),
+                      title: Text('Trash Can'),
                     )),
                 PopupMenuItem(
                     value: 'View_label',
