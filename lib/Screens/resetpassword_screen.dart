@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/Screens/complete_resetpassword_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String email;
+  final String phoneNumber;
 
-  ResetPasswordScreen({required this.email});
+  ResetPasswordScreen({required this.phoneNumber});
 
   @override
   _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
@@ -15,12 +16,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       // Save the new password here
-      // Navigate to the Reset Password Success screen
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (ctx) => ResetPasswordSuccessScreen()));
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await user.updatePassword(_newPasswordController.text);
+          // Navigate to the Reset Password Success screen
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (ctx) => ResetPasswordSuccessScreen()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('No user is currently signed in.'),
+          ));
+        }
+      } catch (e) {
+        print('Error updating password: $e');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to update password: $e'),
+        ));
+      }
     }
   }
 

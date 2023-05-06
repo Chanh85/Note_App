@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "172501748066",
+    "firebase_url": "https://note-app-b808d-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "note-app-b808d",
     "storage_bucket": "note-app-b808d.appspot.com"
   },
@@ -29,6 +30,13 @@
             {
               "client_id": "172501748066-gb9713hk2m660fp1s50q7bhtusnlvoau.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "172501748066-q51j4pef9fvnq3457rahd02hmoli4ui5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.noteApp"
+              }
             }
           ]
         }
