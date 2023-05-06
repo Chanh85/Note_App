@@ -18,6 +18,8 @@ class NoteListScreen extends StatefulWidget {
 }
 
 class _NoteListScreenState extends State<NoteListScreen> {
+  TextEditingController searchController = TextEditingController();
+  List<Map<String, dynamic>> filteredNotes = [];
   bool listView = true;
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
@@ -36,6 +38,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
     super.initState();
     myFocusNode = FocusNode();
     _getUserData();
+    filteredNotes = notes;
   }
 
   void _getUserData() async {
@@ -272,6 +275,35 @@ class _NoteListScreenState extends State<NoteListScreen> {
         print('Invalid form');
       }
     }
+  }
+
+  void _searchNotes(String query) {
+    setState(() {
+      filteredNotes = notes.where((note) {
+        final titleLower = note['title'].toLowerCase();
+        final contentLower = note['content'].toLowerCase();
+        final searchLower = query.toLowerCase();
+
+        return titleLower.contains(searchLower) ||
+            contentLower.contains(searchLower);
+      }).toList();
+    });
+  }
+
+  void filterNotes(String keyword) {
+    setState(() {
+      filteredNotes = notes
+          .where((note) =>
+              note['title']
+                  .toString()
+                  .toLowerCase()
+                  .contains(keyword.toLowerCase()) ||
+              note['content']
+                  .toString()
+                  .toLowerCase()
+                  .contains(keyword.toLowerCase()))
+          .toList();
+    });
   }
 
   void createOrUpdate([Map<String, dynamic>? note]) async {
@@ -799,22 +831,42 @@ class _NoteListScreenState extends State<NoteListScreen> {
           ],
           automaticallyImplyLeading: false,
         ),
-        body: Container(
-          padding: EdgeInsets.all(listView ? 0 : 8),
-          child: listView
-              ? SlidableAutoCloseBehavior(
-                  closeWhenOpened: true,
-                  child: ListView.separated(
-                      itemBuilder: (ctx, idx) => _noteListItem(notes[idx]),
-                      separatorBuilder: (ctx, idx) => Divider(),
-                      itemCount: notes.length),
-                )
-              : GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  itemBuilder: (ctx, idx) => _noteGridItem(notes[idx]),
-                  itemCount: notes.length,
+        body: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                onChanged: (value) => filterNotes(value),
+                decoration: InputDecoration(
+                  labelText: 'Search',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.search),
                 ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(listView ? 0 : 8),
+                child: listView
+                    ? SlidableAutoCloseBehavior(
+                        closeWhenOpened: true,
+                        child: ListView.separated(
+                            itemBuilder: (ctx, idx) =>
+                                _noteListItem(filteredNotes[idx]),
+                            separatorBuilder: (ctx, idx) => Divider(),
+                            itemCount: filteredNotes.length),
+                      )
+                    : GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
+                        itemBuilder: (ctx, idx) =>
+                            _noteGridItem(filteredNotes[idx]),
+                        itemCount: filteredNotes.length,
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
