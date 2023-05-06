@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
-import 'package:note_app/Screens/NoteListScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:note_app/Screens/otp_register_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -11,6 +10,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _auth = FirebaseAuth.instance;
   bool _isObscure = true;
 
   var _key = GlobalKey<FormState>();
@@ -24,26 +24,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _handleSubmit() {
-    if (_key.currentState?.validate() ?? false) {
-      _key.currentState?.save();
-      print(fullname);
-      print(username);
-      print(email);
-      print(password);
-      _key.currentState?.reset();
-      myFocusNode.requestFocus();
+  if (_key.currentState?.validate() ?? false) {
+    _key.currentState?.save();
+    print(fullname);
+    print(username);
+    print(email);
+    print(phoneNumber);
+    print(password);
+    _key.currentState?.reset();
+    myFocusNode.requestFocus();
+
+    _auth
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((result) {
+      // Đăng nhập thành công, chuyển đến màn hình OTP
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (ctx) => OTPVerificationScreen(email: email)));
-    } else {
-      print('Invalid form');
-    }
+              builder: (ctx) =>
+                  OTPVerificationScreen(phoneNumber: phoneNumber)));
+    }).catchError((error) {
+      // Xử lý lỗi đăng ký
+      print("Error: $error");
+    });
+  } else {
+    print('Invalid form');
   }
+}
 
   String fullname = '';
   String username = '';
   String email = '';
+  String phoneNumber = '';
   String password = '';
 
   @override
@@ -111,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: "Username",
                     hintText: "Your username",
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person_4),
+                    prefixIcon: Icon(Icons.person_outline),
                   ),
                 ),
                 SizedBox(
@@ -122,15 +134,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onSaved: (v) {
                     email = v ?? '';
                   },
-                  validator: (v) => EmailValidator.validate(v!)
-                      ? null
-                      : 'Please enter a valid email',
+                  validator: (v) {
+                    if (v == null || v.isEmpty) {
+                      return 'Please enter your email';
+                    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(v)) {
+                      return 'Please enter a valid email address';
+                    }
+                    return null;
+                  },
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: "Email",
-                    hintText: "Email",
+                    hintText: "Your email",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.email),
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onSaved: (v) {
+                    phoneNumber = v ?? '';
+                  },
+                  validator: (v) {
+                    if (v == null || v.isEmpty || v.length < 10) {
+                      return 'Please enter a valid phone number';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: "Phone Number",
+                    hintText: "Your phone number",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.phone),
                   ),
                 ),
                 SizedBox(
@@ -150,7 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     } else if (passNonNullValue.length < 6) {
                       return ("Password Must be more than 5 characters");
                     } else if (!regex.hasMatch(passNonNullValue)) {
-                      return ("Password should contain upper,lower,digit and Special character ");
+                      return ("Password should contain upper, lower, digit, and special character");
                     }
                     return null;
                   },

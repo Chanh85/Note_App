@@ -49,6 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '172501748066',
     projectId: 'note-app-b808d',
     authDomain: 'note-app-b808d.firebaseapp.com',
+    databaseURL: 'https://note-app-b808d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'note-app-b808d.appspot.com',
   );
 
@@ -57,6 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:172501748066:android:9c647fbf34d4583e2c843b',
     messagingSenderId: '172501748066',
     projectId: 'note-app-b808d',
+    databaseURL: 'https://note-app-b808d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'note-app-b808d.appspot.com',
   );
 
@@ -65,6 +67,7 @@ class DefaultFirebaseOptions {
     appId: '1:172501748066:ios:fbf0445f56bcb8392c843b',
     messagingSenderId: '172501748066',
     projectId: 'note-app-b808d',
+    databaseURL: 'https://note-app-b808d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'note-app-b808d.appspot.com',
     iosClientId: '172501748066-q51j4pef9fvnq3457rahd02hmoli4ui5.apps.googleusercontent.com',
     iosBundleId: 'com.example.noteApp',
@@ -75,6 +78,7 @@ class DefaultFirebaseOptions {
     appId: '1:172501748066:ios:fbf0445f56bcb8392c843b',
     messagingSenderId: '172501748066',
     projectId: 'note-app-b808d',
+    databaseURL: 'https://note-app-b808d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'note-app-b808d.appspot.com',
     iosClientId: '172501748066-q51j4pef9fvnq3457rahd02hmoli4ui5.apps.googleusercontent.com',
     iosBundleId: 'com.example.noteApp',
