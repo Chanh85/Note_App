@@ -4,6 +4,7 @@ import 'package:note_app/Screens/LabeledScreen.dart';
 import 'AddNoteScreen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:note_app/utils/ListNote.dart';
+import 'DeletedNotesScreen.dart';
 
 enum Actions{protect,delete, removePassNote, unlockNote, changeNotePass}
 
@@ -26,7 +27,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
   String selectedValue = 'Personal';
   var labelItems = ['Work', 'Personal', 'Family'];
   var _key = GlobalKey<FormState>();
-
+  List<Map<String, dynamic>> deletedNotes = [];
 
 
   @override
@@ -343,6 +344,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
         if(password == note['password'])
         {
           setState(() {
+            deletedNotes.add(note);
             notes.remove(note);
             Fluttertoast.showToast(
                 msg: "Note deleted",
@@ -746,7 +748,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
             builder: (ct) => AlertDialog(
               insetPadding: EdgeInsets.all(20.0),
               contentPadding: EdgeInsets.all(10.0),
-              title: Text('Enter password'),
+              title: Text('Enter password to delete'),
               content: Form(
                 key: _key,
                 child: Column(
@@ -804,6 +806,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
               TextButton(
                   onPressed: (){
                     setState(() {
+                      deletedNotes.add(notes[index]);
                       notes.removeAt(index);
                     });
                     Navigator.pop(context);
