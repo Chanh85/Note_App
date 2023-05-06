@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:note_app/Screens/ChangePassword_Screen.dart';
+import 'package:note_app/Screens/login_Screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -43,6 +45,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Password updated successfully.'),
           ));
+
+          // Navigate to login screen
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginScreen()));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('No user is currently signed in.'),

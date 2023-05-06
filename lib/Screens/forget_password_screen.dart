@@ -97,6 +97,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   height: 25,
                 ),
                 TextFormField(
+                  initialValue: '+84',
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   onSaved: (value) {
                     phoneNumber = value ?? '';

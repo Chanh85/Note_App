@@ -204,7 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   height: 25,
                 ),
                 TextFormField(
-                  initialValue: phoneNumber,
+                  initialValue: '+84',
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   onSaved: (v) {
                     phoneNumber = v ?? '';

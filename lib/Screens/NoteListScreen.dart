@@ -5,6 +5,8 @@ import 'AddNoteScreen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:note_app/utils/ListNote.dart';
 import 'package:note_app/Screens/SettingsPage_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum Actions { protect, delete, removePassNote, unlockNote }
 
@@ -17,6 +19,9 @@ class NoteListScreen extends StatefulWidget {
 
 class _NoteListScreenState extends State<NoteListScreen> {
   bool listView = true;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  late String username;
   late FocusNode myFocusNode;
   String password = "";
   String confirmPassword = "";
@@ -30,6 +35,16 @@ class _NoteListScreenState extends State<NoteListScreen> {
   void initState() {
     super.initState();
     myFocusNode = FocusNode();
+    _getUserData();
+  }
+
+  void _getUserData() async {
+    // Get the current user's data from Firestore
+    final user = _auth.currentUser;
+    final userData = await _firestore.collection('users').doc(user?.uid).get();
+    setState(() {
+      username = userData['username'];
+    });
   }
 
   void _getTapPos(TapDownDetails tapPos) {
@@ -739,18 +754,19 @@ class _NoteListScreenState extends State<NoteListScreen> {
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
+                  value: 'username',
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(username),
+                  ),
+                ),
+                PopupMenuItem(
                   value: 'changeview',
                   child: ListTile(
                     leading: Icon(listView ? Icons.grid_view : Icons.list),
                     title: Text(listView ? 'Grid view' : 'List view'),
                   ),
                 ),
-                PopupMenuItem(
-                    value: 'logout',
-                    child: ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text('Logout'),
-                    )),
                 PopupMenuItem(
                     value: 'View_label',
                     child: ListTile(
@@ -772,6 +788,12 @@ class _NoteListScreenState extends State<NoteListScreen> {
                     title: Text('Settings'),
                   ),
                 ),
+                PopupMenuItem(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                    )),
               ],
             )
           ],
