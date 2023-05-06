@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:note_app/Screens/LabeledScreen.dart';
 import 'AddNoteScreen.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -79,14 +81,24 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
   ];
 
   bool listView = true;
-  var _passcontroller1 = TextEditingController();
-  var _passcontroller2 = TextEditingController();
+  late FocusNode myFocusNode;
+  String password = "";
+  String confirmPassword = "";
   bool validate = false;
   Offset _tapPos = Offset.zero;
   String selectedValue = 'Personal';
   var labelItems = ['Work', 'Personal', 'Family'];
+  var _key = GlobalKey<FormState>();
 
-  void _getTapPos(TapDownDetails tapPos) {
+
+
+  @override
+  void initState() {
+    super.initState();
+    myFocusNode = FocusNode();
+  }
+
+  void _getTapPos(TapDownDetails tapPos){
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     setState(() {
       _tapPos = renderBox.globalToLocal(tapPos.globalPosition);
@@ -155,6 +167,7 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     showDialog(
         context: context,
         builder: (ctx) => StatefulBuilder(
+<<<<<<< HEAD
               builder: (ctx, setDialogState) => AlertDialog(
                 title: Text('Choose label'),
                 content: Column(
@@ -183,10 +196,43 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                       },
                       child: Text('OK')),
                 ],
+=======
+          builder: (ctx, setDialogState) => AlertDialog(
+            title: Text('Choose label'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: labelItems.map((e) => RadioListTile(
+                title: Text(e),
+                  value: e,
+                  groupValue: selectedValue,
+                  onChanged: (v){
+                    setState(() {
+                      setDialogState((){
+                        selectedValue = v!;
+                      });
+                    });
+                  })).toList(),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: (){
+                    note['label'] = selectedValue;
+                    Fluttertoast.showToast(
+                        msg: "Note added to ${note['label']} label",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        textColor: Colors.white,
+                        fontSize: 16.0
+                    );
+                    Navigator.pop(context);},
+                  child: Text('OK')
+>>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
               ),
             ));
   }
 
+<<<<<<< HEAD
   bool isPinned(Map<String, dynamic> note) {
     return note['pinned'] ?? false;
   }
@@ -205,6 +251,20 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
       return false;
     }
     return true;
+=======
+  bool _handleSubmit()
+  {
+    if (_key.currentState?.validate() ?? false) {
+      _key.currentState?.save();
+      print(password);
+      print(confirmPassword);
+      _key.currentState?.reset();
+      myFocusNode.requestFocus();
+    } else {
+      print('Invalid form');
+    }
+    return false;
+>>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
   }
 
   void createOrUpdate([Map<String, dynamic>? note]) async {
@@ -240,6 +300,7 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
     }
   }
 
+<<<<<<< HEAD
   void _onProtect(note, lock, Actions action) {
     showDialog(
         context: context,
@@ -293,12 +354,91 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
               ],
             ));
 
+=======
+    void _onProtect(note, lock, Actions action){
+       showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ct) => AlertDialog(
+            insetPadding: EdgeInsets.all(20.0),
+            contentPadding: EdgeInsets.all(10.0),
+            title: Text('Set password'),
+            content: Form(
+              key: _key,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    focusNode: myFocusNode,
+                    onChanged: (v){
+                      password = v;
+                    },
+                    onSaved: (v) {
+                      password = v ?? '';
+                    },
+                    validator: (v) {
+                      var passNonNullValue = v ?? "";
+                      if (passNonNullValue.isEmpty) {
+                        return ("Password is required");
+                      } else if (passNonNullValue.length < 6) {
+                        return ("Password Must be more than 5 characters");
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      hintText: "Password",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.password),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    onSaved: (v) {
+                      confirmPassword = v ?? '';
+                    },
+                    validator: (v) {
+                      if (v == null || v.isEmpty || v.length < 3 || v != password) {
+                        return 'Password does not match';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.name,
+                    decoration: InputDecoration(
+                      labelText: "Confirm password",
+                      hintText: "Confirm password",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person_4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: (){
+                    _handleSubmit();
+                    Navigator.pop(context);
+                  },
+                  child: Text('Set')
+              ),
+              TextButton(
+                  onPressed: (){Navigator.pop(context);},
+                  child: Text('Cancel')
+              ),
+            ],
+          ));
+>>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
     setState(() {
       if (_handleSubmit()) {
         note['lock'] = !lock;
       }
     });
-    print(note['title']);
   }
 
   void _onDelete(int index, Actions action) {
@@ -466,6 +606,7 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                       context: context,
                       barrierDismissible: false,
                       builder: (ct) => AlertDialog(
+<<<<<<< HEAD
                             title: Text('Logout?'),
                             content: Text('Are you sure want to logout?'),
                             actions: [
@@ -499,6 +640,41 @@ Theo điều luật trên, luật sư Hải cho hay dù mức phạt dưới 250
                                 .toList(),
                           ));
                 }
+=======
+                        title: Text('Logout?'),
+                        content: Text('Are you sure want to logout?'),
+                        actions: [
+                          TextButton(
+                              onPressed: (){
+                                Navigator.popUntil(context, ModalRoute.withName('/'));
+                              },
+                              child: Text('Yes')
+                          ),
+                          TextButton(
+                              onPressed: (){Navigator.pop(context);},
+                              child: Text('No')
+                          ),
+                        ],
+                      ));
+                  }
+                else if(value == 'View_label')
+                  {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (ctx) =>ListView(
+                          shrinkWrap: true,
+                          children: labelItems.map((e) => ListTile(
+                            title: Text(e, textAlign: TextAlign.center,),
+                            onTap: () async{
+                              Navigator.pop(context);
+                              await Navigator.push(context,
+                                  MaterialPageRoute(builder: (ctx) => LabeledScreen(listview: listView, labelItems: labelItems, notes: notes, label: e)));
+                            },
+                          )).toList(),
+                        )
+                    );
+                  }
+>>>>>>> 53c2c57e2c8285fdcc242c76f3972139d8ec7f03
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
