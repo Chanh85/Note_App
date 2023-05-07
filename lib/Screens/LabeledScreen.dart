@@ -308,7 +308,7 @@ class _LabeledScreenState extends State<LabeledScreen> {
                                   filteredNotes = _workLabeledList;
                                 }
                               }
-                              if(filteredNotes.isEmpty)
+                              if(_workLabeledList.isEmpty)
                               {
                                 filteredNotes = [];
                               }
@@ -329,7 +329,7 @@ class _LabeledScreenState extends State<LabeledScreen> {
                                   filteredNotes = _familyLabeledList;
                                 }
                               }
-                              if(filteredNotes.isEmpty)
+                              if(_familyLabeledList.isEmpty)
                                 {
                                   filteredNotes = [];
                                 }
@@ -350,7 +350,7 @@ class _LabeledScreenState extends State<LabeledScreen> {
                                   filteredNotes = _personalLabeledList;
                                 }
                               }
-                              if(filteredNotes.isEmpty)
+                              if(_personalLabeledList.isEmpty)
                                 {
                                   filteredNotes = [];
                                 }

@@ -427,27 +427,10 @@ class _NoteListScreenState extends State<NoteListScreen> {
     });
   }
 
-  void createOrUpdate(
-      [Map<String, dynamic>? note,
-      String? fontFamily,
-      double? fontSize]) async {
-    if (note != null) {
-      // Update the note with the new fontFamily and fontSize
-      note['fontFamily'] = fontFamily ?? note['fontFamily'];
-      note['fontSize'] = fontSize ?? note['fontSize'];
-    } else {
-      // Create a new note with the specified fontFamily and fontSize
-      note = {
-        'title': '',
-        'content': '',
-        'dueDate': '',
-        'fontFamily': fontFamily ?? 'Roboto',
-        'fontSize': fontSize ?? 16.0,
-      };
-    }
-    String title = note['title'] ?? '';
-    String content = note['content'] ?? '';
-    String dueDate = note['dueDate'] ?? '';
+  void createOrUpdate([Map<String, dynamic>? note, String? fontFamily, double? fontSize]) async {
+    String title = note?['title'] ?? '';
+    String content = note?['content'] ?? '';
+    String dueDate = note?['dueDate'] ?? '';
 
     var data = await Navigator.push(context,
         MaterialPageRoute(builder: (ctx) => AddNoteScreen(note: note)));
