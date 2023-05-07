@@ -7,6 +7,8 @@ import 'package:note_app/utils/ListNote.dart';
 import 'package:note_app/Screens/SettingsPage_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:note_app/Screens/FontSettingsData.dart';
+import 'package:provider/provider.dart';
 
 enum Actions { protect, delete, removePassNote, unlockNote }
 
@@ -306,10 +308,27 @@ class _NoteListScreenState extends State<NoteListScreen> {
     });
   }
 
-  void createOrUpdate([Map<String, dynamic>? note]) async {
-    String title = note?['title'] ?? '';
-    String content = note?['content'] ?? '';
-    String dueDate = note?['dueDate'] ?? '';
+  void createOrUpdate(
+      [Map<String, dynamic>? note,
+      String? fontFamily,
+      double? fontSize]) async {
+    if (note != null) {
+      // Update the note with the new fontFamily and fontSize
+      note['fontFamily'] = fontFamily ?? note['fontFamily'];
+      note['fontSize'] = fontSize ?? note['fontSize'];
+    } else {
+      // Create a new note with the specified fontFamily and fontSize
+      note = {
+        'title': '',
+        'content': '',
+        'dueDate': '',
+        'fontFamily': fontFamily ?? 'Roboto',
+        'fontSize': fontSize ?? 16.0,
+      };
+    }
+    String title = note['title'] ?? '';
+    String content = note['content'] ?? '';
+    String dueDate = note['dueDate'] ?? '';
 
     var data = await Navigator.push(context,
         MaterialPageRoute(builder: (ctx) => AddNoteScreen(note: note)));
@@ -332,7 +351,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
       }
     } else {
       setState(() {
-        notes.insert(0, Map<String, String>.from(data));
+        notes.insert(0, Map<String, dynamic>.from(data));
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -566,6 +585,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
 
   Widget _noteGridItem(note) {
     bool lock = note['lock'] ?? false;
+    double fontSize = Provider.of<FontSettingsData>(context).fontSize;
+
     return GestureDetector(
       onTap: () {
         lock
@@ -590,7 +611,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.deepOrange.shade900,
-                  fontSize: 16,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -620,6 +641,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
   }
 
   Widget _noteListItem(note) {
+    final fontSettings = Provider.of<FontSettingsData>(context);
+
     bool lock = note['lock'] ?? false;
     return Slidable(
       key: Key(note['title']),
@@ -689,8 +712,10 @@ class _NoteListScreenState extends State<NoteListScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                  fontSize: fontSettings.fontSize, // Apply the font size
+                  fontFamily:
+                      fontSettings.selectedFont, // Apply the font family
                   color: Color.fromARGB(255, 133, 34, 4),
-                  fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -708,6 +733,10 @@ class _NoteListScreenState extends State<NoteListScreen> {
         ),
         subtitle: Text(
           note['content'],
+          style: TextStyle(
+              fontSize: fontSettings.fontSize, // Apply the font size
+              fontFamily: fontSettings.selectedFont // Apply the font family
+              ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.start,

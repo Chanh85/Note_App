@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/Screens/ChangePassword_Screen.dart';
+import 'package:note_app/Screens/TextSizeAndFontSettings_screen.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -33,9 +34,27 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             leading: Icon(Icons.text_fields),
-            title: Text('Set Default Text Size and Font for New Notes'),
+            title: Text('Set Text Size and Font for New Notes'),
             onTap: () {
-              // Navigate to Text Size and Font Settings Screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => TextSizeAndFontSettings()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.delete),
+            title: Text('Set automatic deletion time for notes in the trash'),
+            onTap: () {
+              // Navigate to Auto-Delete Settings Screen
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.notifications),
+            title: Text('Notification sound'),
+            onTap: () {
+              // Navigate to Notification Sound Settings Screen
             },
           ),
         ],
