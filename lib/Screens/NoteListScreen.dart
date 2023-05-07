@@ -969,12 +969,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
                   }
                 });
               }),
-          SlidableAction(
-              backgroundColor: Color.fromARGB(255, 255, 59, 213),
-              icon: Icons.share,
-              label: 'Share',
-              onPressed: (context) =>
-                  shareNote(context, note['title'], note['content'])),
         ],
       ),
       endActionPane: ActionPane(

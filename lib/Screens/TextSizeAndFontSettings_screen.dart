@@ -47,7 +47,6 @@ class _TextSizeAndFontSettingsState extends State<TextSizeAndFontSettings> {
                     value: fontSettingsData.selectedFont,
                     onChanged: (newValue) {
                       fontSettingsData.updateFont(newValue ?? 'Roboto');
-                      showUpdateSnackBar(context, 'Font updated!');
                     },
                     items: fonts.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
@@ -67,7 +66,6 @@ class _TextSizeAndFontSettingsState extends State<TextSizeAndFontSettings> {
                     divisions: 4, // Change to a smaller value
                     onChanged: (newValue) {
                       fontSettingsData.updateFontSize(newValue);
-                      showUpdateSnackBar(context, 'Font size updated!');
                     },
                   ),
                   Padding(
