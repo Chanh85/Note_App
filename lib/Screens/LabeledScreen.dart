@@ -152,48 +152,53 @@ class _LabeledScreenState extends State<LabeledScreen> {
         color: lock ? Colors.lightGreen : Colors.yellow.shade300,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Column(children: [
-            Text(
-              note['title'],
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.deepOrange.shade900,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Text(
-              'Due: ${note['dueDate']}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-              ),
-            ),
-            SizedBox(height: 3,),
-            note['label'] != ''?
-            Text(
-              'Label: ${note['label']}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-              ),
-            ): SizedBox(height: 1,),
-            SizedBox(
-              height: 15,
-            ),
-            Text(
-              note['content'],
-              maxLines: 5,
-              textAlign: TextAlign.justify,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ]),
+          child: Wrap(
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      note['title'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.deepOrange.shade900,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      'Due: ${note['dueDate']}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(height: 3,),
+                    note['label'] != ''?
+                    Text(
+                      'Label: ${note['label']}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ): SizedBox(height: 1,),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      note['content'],
+                      maxLines: 5,
+                      textAlign: TextAlign.justify,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ]),
         ),
       ),
     );
@@ -206,9 +211,7 @@ class _LabeledScreenState extends State<LabeledScreen> {
             onTap: () {
             },
             trailing: lock? Icon(Icons.lock): null,
-            title: Row(
-              children: [
-                Text(
+            title: Text(
                   note['title'],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -217,7 +220,16 @@ class _LabeledScreenState extends State<LabeledScreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold),
                 ),
-                SizedBox(width: 15,),
+            subtitle: Column(
+              children: [
+                Text(
+                  note['content'],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(
+                  height: 5,
+                ),
                 Text(
                   'Due: ${note['dueDate']}',
                   maxLines: 1,
@@ -227,7 +239,7 @@ class _LabeledScreenState extends State<LabeledScreen> {
                   ),
                 ),
                 SizedBox(
-                  width: 7,
+                  height: 7,
                 ),
                 note['label'] != ''?
                 Text(
@@ -239,11 +251,6 @@ class _LabeledScreenState extends State<LabeledScreen> {
                   ),
                 ): SizedBox(width: 1,),
               ],
-            ),
-            subtitle: Text(
-              note['content'],
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           );
   }

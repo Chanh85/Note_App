@@ -50,7 +50,6 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     _note!['content'] = _content.text;
     _note!['dueDate'] = '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
     _note!['label'] = '';
-    _note!['password'] = '';
     _note!['pinned'] = false;
     Navigator.pop(context, _note);
   }

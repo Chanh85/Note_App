@@ -874,7 +874,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
 
   Widget _noteGridItem(note) {
     bool lock = note['lock'] ?? false;
-    double fontSize = Provider.of<FontSettingsData>(context).fontSize;
 
     return GestureDetector(
       onTap: () {
@@ -891,48 +890,53 @@ class _NoteListScreenState extends State<NoteListScreen> {
       child: Card(
         color: lock ? Colors.lightGreen : Colors.yellow.shade300,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(children: [
-            Text(
-              note['title'],
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.deepOrange.shade900,
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Text(
-              'Due: ${note['dueDate']}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-              ),
-            ),
-            SizedBox(height: 3,),
-            note['label'] != ''?
-            Text(
-              'Label: ${note['label']}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-              ),
-            ): SizedBox(height: 1,),
-            SizedBox(
-              height: 15,
-            ),
-            Text(
-              note['content'],
-              maxLines: 5,
-              textAlign: TextAlign.justify,
-              overflow: TextOverflow.ellipsis,
-            ),
+          padding: const EdgeInsets.all(10.0),
+          child: Wrap(
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      note['title'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.deepOrange.shade900,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      'Due: ${note['dueDate']}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(height: 3,),
+                    note['label'] != ''?
+                    Text(
+                      'Label: ${note['label']}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ): SizedBox(height: 1,),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      note['content'],
+                      maxLines: 5,
+                      textAlign: TextAlign.justify,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
           ]),
         ),
       ),
@@ -940,8 +944,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
   }
 
   Widget _noteListItem(note) {
-    final fontSettings = Provider.of<FontSettingsData>(context);
-
     bool lock = note['lock'] ?? false;
     return Slidable(
       key: Key(note['title']),
@@ -1004,62 +1006,59 @@ class _NoteListScreenState extends State<NoteListScreen> {
         ],
       ),
       child: ListTile(
-        leading: Icon(Icons.note_rounded),
-        onTap: () {
-          lock
-              ? _onProtect(note, lock, Actions.unlockNote)
-              : createOrUpdate(note);
-        },
-        trailing: lock ? Icon(Icons.lock) : null,
-        title: Row(
-          children: [
-            Text(
-              note['title'],
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: fontSettings.fontSize, // Apply the font size
-                  fontFamily:
-                      fontSettings.selectedFont, // Apply the font family
-                  color: Color.fromARGB(255, 133, 34, 4),
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Text(
-              'Due: ${note['dueDate']}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
+          leading: Icon(Icons.note_rounded),
+          onTap: () {
+            lock
+                ? _onProtect(note, lock, Actions.unlockNote)
+                : createOrUpdate(note);
+          },
+          trailing: lock ? Icon(Icons.lock) : Icon(null),
+          title: Text(
+                note['title'],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 133, 34, 4),
+                    fontWeight: FontWeight.bold),
               ),
-            ),
-            SizedBox(
-              width: 7,
-            ),
-            note['label'] != ''?
-            Text(
-              'Label: ${note['label']}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
+          subtitle: Column(
+            children: [
+              Text(
+                note['content'],
+                style: TextStyle(
+                    fontSize: 16, // Apply the font size
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
               ),
-            ): SizedBox(width: 1,),
-          ],
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Due: ${note['dueDate']}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+              SizedBox(
+                height: 7,
+              ),
+              note['label'] != ''?
+              Text(
+                'Label: ${note['label']}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+              ): SizedBox(width: 1,),
+            ],
+          ),
         ),
-        subtitle: Text(
-          note['content'],
-          style: TextStyle(
-              fontSize: fontSettings.fontSize, // Apply the font size
-              fontFamily: fontSettings.selectedFont // Apply the font family
-              ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.start,
-        ),
-      ),
     );
   }
 
@@ -1203,6 +1202,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
               padding: EdgeInsets.all(8.0),
               child: TextField(
                 controller: searchController,
+                autofocus: false,
                 onChanged: (value) => filterNotes(value),
                 decoration: InputDecoration(
                   labelText: 'Search',
