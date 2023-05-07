@@ -7,6 +7,8 @@ import 'package:note_app/utils/ListNote.dart';
 import 'package:note_app/Screens/SettingsPage_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'DeletedNotesScreen.dart';
+import 'package:share/share.dart';
 
 enum Actions { protect, delete, removePassNote, unlockNote, changeNotePass }
 
@@ -23,7 +25,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
   bool listView = true;
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
-  late String username ='';
+  late String username = '';
   late FocusNode myFocusNode;
   String password = "";
   String confirmPassword = "";
@@ -149,8 +151,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
       case 'RemovePass':
         _onProtect(note, lock, Actions.removePassNote);
         break;
-      case 'ChangePass' : _onProtect(note, lock, Actions.changeNotePass);
-      break;
+      case 'ChangePass':
+        _onProtect(note, lock, Actions.changeNotePass);
+        break;
       case 'pinned':
         setState(() {
           if (isPinned(note)) {
@@ -238,8 +241,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       }
     }
     if (action == Actions.removePassNote) {
@@ -276,8 +278,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       }
     }
     if (action == Actions.unlockNote) {
@@ -303,16 +304,13 @@ class _NoteListScreenState extends State<NoteListScreen> {
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       }
     }
-    if(action == Actions.changeNotePass)
-    {
+    if (action == Actions.changeNotePass) {
       if (_key.currentState?.validate() ?? false) {
         _key.currentState?.save();
-        if(oldPass == note['password'])
-        {
+        if (oldPass == note['password']) {
           note['password'] = confirmPassword;
           Fluttertoast.showToast(
               msg: "Password changed successfully!",
@@ -320,18 +318,15 @@ class _NoteListScreenState extends State<NoteListScreen> {
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
               textColor: Colors.white,
-              fontSize: 16.0
-          );
-        }
-        else {
+              fontSize: 16.0);
+        } else {
           Fluttertoast.showToast(
               msg: "Wrong old password, check again!",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
               textColor: Colors.white,
-              fontSize: 16.0
-          );
+              fontSize: 16.0);
         }
         _key.currentState?.reset();
         myFocusNode.requestFocus();
@@ -342,16 +337,13 @@ class _NoteListScreenState extends State<NoteListScreen> {
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       }
     }
-    if(action == Actions.delete)
-    {
+    if (action == Actions.delete) {
       if (_key.currentState?.validate() ?? false) {
         _key.currentState?.save();
-        if(password == note['password'])
-        {
+        if (password == note['password']) {
           setState(() {
             deletedNotes.add(note);
             notes.remove(note);
@@ -361,19 +353,16 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 gravity: ToastGravity.CENTER,
                 timeInSecForIosWeb: 1,
                 textColor: Colors.white,
-                fontSize: 16.0
-            );
+                fontSize: 16.0);
           });
-        }
-        else {
+        } else {
           Fluttertoast.showToast(
               msg: "Wrong password!",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
               textColor: Colors.white,
-              fontSize: 16.0
-          );
+              fontSize: 16.0);
         }
         _key.currentState?.reset();
         myFocusNode.requestFocus();
@@ -384,8 +373,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       }
     }
   }
@@ -649,11 +637,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
                       child: Text('Cancel')),
                 ],
               ));
-    }
-    else if(action == Actions.changeNotePass)
-    {
-      if(note['password'] == '')
-      {
+    } else if (action == Actions.changeNotePass) {
+      if (note['password'] == '') {
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -662,201 +647,207 @@ class _NoteListScreenState extends State<NoteListScreen> {
             content: Text('Please set password first!'),
             actions: [
               TextButton(
-                  onPressed: (){
+                  onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text('OK'))
             ],
-          ),);
-      }
-      else
-      {
+          ),
+        );
+      } else {
         showDialog(
             context: context,
             barrierDismissible: false,
             builder: (ct) => AlertDialog(
-              insetPadding: EdgeInsets.all(20.0),
-              contentPadding: EdgeInsets.all(10.0),
-              title: Text('Set password'),
-              content: Form(
-                key: _key,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      focusNode: myFocusNode,
-                      onSaved: (v) {
-                        oldPass = v ?? '';
-                      },
-                      validator: (v) {
-                        var passNonNullValue = v ?? "";
-                        if (passNonNullValue.isEmpty) {
-                          return ("Password is required");
-                        } else if (passNonNullValue.length < 6) {
-                          return ("Password Must be more than 5 characters");
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        labelText: "Old password",
-                        hintText: "Old password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.password),
-                      ),
+                  insetPadding: EdgeInsets.all(20.0),
+                  contentPadding: EdgeInsets.all(10.0),
+                  title: Text('Set password'),
+                  content: Form(
+                    key: _key,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          focusNode: myFocusNode,
+                          onSaved: (v) {
+                            oldPass = v ?? '';
+                          },
+                          validator: (v) {
+                            var passNonNullValue = v ?? "";
+                            if (passNonNullValue.isEmpty) {
+                              return ("Password is required");
+                            } else if (passNonNullValue.length < 6) {
+                              return ("Password Must be more than 5 characters");
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: "Old password",
+                            hintText: "Old password",
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.password),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          onChanged: (v) {
+                            password = v;
+                          },
+                          onSaved: (v) {
+                            password = v ?? '';
+                          },
+                          validator: (v) {
+                            var passNonNullValue = v ?? "";
+                            if (passNonNullValue.isEmpty) {
+                              return ("Password is required");
+                            } else if (passNonNullValue.length < 6) {
+                              return ("Password Must be more than 5 characters");
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: "New password",
+                            hintText: "New password",
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.password),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          onSaved: (v) {
+                            confirmPassword = v ?? '';
+                          },
+                          validator: (v) {
+                            if (v == null ||
+                                v.isEmpty ||
+                                v.length < 3 ||
+                                v != password) {
+                              return 'Password does not match';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            labelText: "Confirm password",
+                            hintText: "Confirm password",
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.person_4),
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: 25,
-                    ),
-                    TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged: (v){
-                        password = v;
-                      },
-                      onSaved: (v) {
-                        password = v ?? '';
-                      },
-                      validator: (v) {
-                        var passNonNullValue = v ?? "";
-                        if (passNonNullValue.isEmpty) {
-                          return ("Password is required");
-                        } else if (passNonNullValue.length < 6) {
-                          return ("Password Must be more than 5 characters");
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        labelText: "New password",
-                        hintText: "New password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.password),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 25,
-                    ),
-                    TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (v) {
-                        confirmPassword = v ?? '';
-                      },
-                      validator: (v) {
-                        if (v == null || v.isEmpty || v.length < 3 || v != password) {
-                          return 'Password does not match';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        labelText: "Confirm password",
-                        hintText: "Confirm password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person_4),
-                      ),
-                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          _handleSubmit(note, lock, action);
+                          Navigator.pop(context);
+                        },
+                        child: Text('Set')),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel')),
                   ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: (){
-                      _handleSubmit(note,lock, action);
-                      Navigator.pop(context);
-                    },
-                    child: Text('Set')
-                ),
-                TextButton(
-                    onPressed: (){Navigator.pop(context);},
-                    child: Text('Cancel')
-                ),
-              ],
-            ));
+                ));
       }
     }
   }
 
-  void _onDelete(int index, lock, Actions action){
-    if(notes[index]['password'] != '')
-    {
+  void _navigateToDeletedNotesScreen() {
+    List<Map<String, dynamic>> deletedNotes =
+        notes.where((note) => note['deleted'] == true).toList();
+    Navigator.pushNamed(context, '/deleted_notes', arguments: deletedNotes);
+  }
+
+  void _onDelete(int index, lock, Actions action) {
+    if (notes[index]['password'] != '') {
       showDialog(
           context: context,
           barrierDismissible: false,
           builder: (ct) => AlertDialog(
-            insetPadding: EdgeInsets.all(20.0),
-            contentPadding: EdgeInsets.all(10.0),
-            title: Text('Enter password to delete'),
-            content: Form(
-              key: _key,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    focusNode: myFocusNode,
-                    onSaved: (v) {
-                      password = v ?? '';
-                    },
-                    validator: (v) {
-                      var passNonNullValue = v ?? "";
-                      if (passNonNullValue.isEmpty) {
-                        return ("Password is required");
-                      } else if (passNonNullValue.length < 6) {
-                        return ("Password Must be more than 5 characters");
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      hintText: "Password",
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.password),
-                    ),
+                insetPadding: EdgeInsets.all(20.0),
+                contentPadding: EdgeInsets.all(10.0),
+                title: Text('Enter password to delete'),
+                content: Form(
+                  key: _key,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        focusNode: myFocusNode,
+                        onSaved: (v) {
+                          password = v ?? '';
+                        },
+                        validator: (v) {
+                          var passNonNullValue = v ?? "";
+                          if (passNonNullValue.isEmpty) {
+                            return ("Password is required");
+                          } else if (passNonNullValue.length < 6) {
+                            return ("Password Must be more than 5 characters");
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          hintText: "Password",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.password),
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _handleSubmit(notes[index], lock, action);
+                      },
+                      child: Text('OK')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Cancel')),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: (){
-                    Navigator.pop(context);
-                    _handleSubmit(notes[index],lock, action);
-                  },
-                  child: Text('OK')
-              ),
-              TextButton(
-                  onPressed: (){Navigator.pop(context);},
-                  child: Text('Cancel')
-              ),
-            ],
-          ));
-    }
-    else {
+              ));
+    } else {
       showDialog(
           context: context,
           barrierDismissible: false,
           builder: (ct) => AlertDialog(
-            title: Text('Delete?'),
-            content: Text('Are you sure want to delete?'),
-            actions: [
-              TextButton(
-                  onPressed: (){
-                    setState(() {
-                      deletedNotes.add(notes[index]);
-                      notes.removeAt(index);
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: Text('Yes')
-              ),
-              TextButton(
-                  onPressed: (){Navigator.pop(context);},
-                  child: Text('No')
-              ),
-            ],
-          ));
+                title: Text('Delete?'),
+                content: Text('Are you sure want to delete?'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        setState(() {
+                          deletedNotes.add(notes[index]);
+                          notes.removeAt(index);
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Text('Yes')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('No')),
+                ],
+              ));
     }
   }
 
@@ -955,7 +946,13 @@ class _NoteListScreenState extends State<NoteListScreen> {
                     notes.insert(0, note);
                   }
                 });
-              })
+              }),
+          SlidableAction(
+              backgroundColor: Color.fromARGB(255, 255, 59, 213),
+              icon: Icons.share,
+              label: 'Share',
+              onPressed: (context) =>
+                  shareNote(context, note['title'], note['content'])),
         ],
       ),
       endActionPane: ActionPane(
@@ -965,7 +962,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
             backgroundColor: Colors.pinkAccent,
             icon: Icons.change_circle,
             label: 'Change password',
-            onPressed: (context) => _onProtect(note, lock, Actions.changeNotePass),
+            onPressed: (context) =>
+                _onProtect(note, lock, Actions.changeNotePass),
           ),
           SlidableAction(
             backgroundColor: Colors.red,
@@ -1016,6 +1014,11 @@ class _NoteListScreenState extends State<NoteListScreen> {
         ),
       ),
     );
+  }
+
+  void shareNote(BuildContext context, String title, String content) {
+    final text = '$title\n\n$content';
+    Share.share(text);
   }
 
   @override
@@ -1084,6 +1087,17 @@ class _NoteListScreenState extends State<NoteListScreen> {
                                     ))
                                 .toList(),
                           ));
+                } else if (value == 'trash_can') {
+                  setState(() {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DeletedNotesScreen(
+                          notes: deletedNotes,
+                        ),
+                      ),
+                    );
+                  });
                 }
               },
               itemBuilder: (context) => [
@@ -1106,6 +1120,12 @@ class _NoteListScreenState extends State<NoteListScreen> {
                     child: ListTile(
                       leading: Icon(Icons.label_important_outlined),
                       title: Text('View labeled items'),
+                    )),
+                PopupMenuItem(
+                    value: 'trash_can',
+                    child: ListTile(
+                      leading: Icon(Icons.delete),
+                      title: Text('Trash can'),
                     )),
                 PopupMenuItem(
                   value: 'settings',
