@@ -25,7 +25,6 @@ class _DeletedNotesScreenState extends State<DeletedNotesScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +43,7 @@ class _DeletedNotesScreenState extends State<DeletedNotesScreen> {
                   arguments: noteIndex);
             },
             trailing: IconButton(
-              icon: Icon(Icons.restore),
+              icon: Icon(Icons.delete),
               onPressed: () {
                 _restoreNoteDialog(context, noteIndex);
               },
@@ -60,15 +59,15 @@ class _DeletedNotesScreenState extends State<DeletedNotesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Restore Note'),
-        content: Text('Do you want to restore this note?'),
+        title: Text('Delete Completely'),
+        content: Text('Do you want to delete completely this note?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _restoreNote(noteIndex);
             },
-            child: Text('Restore'),
+            child: Text('Sure'),
           ),
           TextButton(
             onPressed: () {
