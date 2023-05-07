@@ -31,6 +31,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
   bool validate = false;
   Offset _tapPos = Offset.zero;
   String selectedValue = 'Personal';
+  var labelItems2 = ['Work', 'Personal', 'Family', 'Remove Label'];
   var labelItems = ['Work', 'Personal', 'Family'];
   List<Map<String, dynamic>> deletedNotes = [];
   var _key = GlobalKey<FormState>();
@@ -176,7 +177,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 title: Text('Choose label'),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: labelItems
+                  children: labelItems2
                       .map((e) => RadioListTile(
                           title: Text(e),
                           value: e,
@@ -193,14 +194,44 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 actions: [
                   TextButton(
                       onPressed: () {
-                        note['label'] = selectedValue;
-                        Fluttertoast.showToast(
-                            msg: "Note added to ${note['label']} label",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                        if(selectedValue == 'Remove Label')
+                          {
+                            if(note['label'] == '')
+                              {
+                                Fluttertoast.showToast(
+                                    msg: "Note does not have a label!",
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 2,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                              }
+                            else{
+                              setState(() {
+                                note['label'] = '';
+                              });
+                              Fluttertoast.showToast(
+                                  msg: "Label removed!",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            }
+                          }
+                        else
+                          {
+                            setState(() {
+                              note['label'] = selectedValue;
+                            });
+                            Fluttertoast.showToast(
+                                msg: "Note added to ${note['label']} label",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 1,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                          }
                         Navigator.pop(context);
                       },
                       child: Text('OK')),
@@ -390,18 +421,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
     }
   }
 
-  void _searchNotes(String query) {
-    setState(() {
-      filteredNotes = notes.where((note) {
-        final titleLower = note['title'].toLowerCase();
-        final contentLower = note['content'].toLowerCase();
-        final searchLower = query.toLowerCase();
-
-        return titleLower.contains(searchLower) ||
-            contentLower.contains(searchLower);
-      }).toList();
-    });
-  }
 
   void filterNotes(String keyword) {
     setState(() {
@@ -446,6 +465,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
     } else {
       setState(() {
         notes.insert(0, Map<String, dynamic>.from(data));
+        filteredNotes = notes;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -900,6 +920,16 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 fontSize: 12,
               ),
             ),
+            SizedBox(height: 3,),
+            note['label'] != ''?
+            Text(
+              'Label: ${note['label']}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ): SizedBox(height: 1,),
             SizedBox(
               height: 15,
             ),
@@ -977,7 +1007,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
         ],
       ),
       child: ListTile(
-        leading: Icon(Icons.newspaper),
+        leading: Icon(Icons.note_rounded),
         onTap: () {
           lock
               ? _onProtect(note, lock, Actions.unlockNote)
@@ -1006,6 +1036,18 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 fontSize: 12,
               ),
             ),
+            SizedBox(
+              width: 7,
+            ),
+            note['label'] != ''?
+            Text(
+              'Label: ${note['label']}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ): SizedBox(width: 1,),
           ],
         ),
         subtitle: Text(
@@ -1079,6 +1121,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
                                                     listview: listView,
                                                     labelItems: labelItems,
                                                     notes: notes,
+                                                    username: username,
                                                     label: e)));
                                       },
                                     ))
